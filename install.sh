@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPOSITORY="${CPP_PRINTER_REPOSITORY:-https://github.com/BlueNovaStudio/bluenova-toolkit.git}"
+REPOSITORY="${CPP_PRINTER_REPOSITORY:-https://github.com/BlueNovaStudio/cpp-printer.git}"
 REF="${CPP_PRINTER_REF:-main}"
 
 if [[ -n "${CPP_PRINTER_PREFIX:-}" ]]; then

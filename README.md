@@ -27,14 +27,14 @@ En Linux o macOS puedes instalar los headers y la configuración de CMake en tu
 directorio personal con una sola línea:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
 ```
 
 Para compilar como una biblioteca del sistema, sin `-I` ni rutas adicionales,
 instálala en `/usr/local/include`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
 ```
 
 Después cualquier archivo puede usarla directamente:
@@ -63,7 +63,7 @@ Si prefieres aislarla dentro de un solo proyecto, instala en una carpeta local:
 
 ```bash
 mkdir -p .deps
-CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh)
+CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh)
 ```
 
 Y compila ese proyecto con:
@@ -75,7 +75,7 @@ c++ -std=c++17 -I"$PWD/.deps/include" main.cpp -o app
 También puedes inspeccionar el script antes de ejecutarlo o cambiar el destino:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh -o install.sh
 CPP_PRINTER_PREFIX="$HOME/.local" bash install.sh
 ```
 

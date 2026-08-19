@@ -37,7 +37,7 @@ ctest --test-dir build --output-on-failure
 En Linux o macOS puedes instalar los headers sin un gestor de paquetes:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
 ```
 
 Por defecto se instala en `~/.local`. Compila incluyendo sus headers con:
@@ -51,7 +51,7 @@ equivalente a `.venv`. Para aislar la biblioteca en un proyecto concreto:
 
 ```bash
 mkdir -p .deps
-CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh)
+CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh)
 c++ -std=c++17 -I"$PWD/.deps/include" main.cpp -o app
 ```
 
@@ -59,7 +59,7 @@ Si quieres usarla como un header del sistema y compilar sin `-I`, instala con
 permisos administrativos:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
 ```
 
 Esto instala los headers en `/usr/local/include/cpp_printer`. Después puedes
