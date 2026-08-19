@@ -9,6 +9,10 @@ Este tutorial muestra cómo instalar `cpp_printer`, crear un archivo C++ y
 compilarlo desde la terminal. La forma más sencilla es usar WSL/Linux con
 `g++`; en Windows nativo consulta la sección [Windows nativo](#windows-nativo).
 
+> **Antes de empezar:** Windows, WSL y MSYS2 son entornos distintos. Elige uno
+> y usa sus rutas y su compilador de principio a fin. Si tu prompt empieza por
+> `bluenova@Studio`, estás en WSL; si empieza por `PS C:\`, estás en PowerShell.
+
 ### 1. Abre el entorno de desarrollo
 
 En WSL, abre una terminal Ubuntu y entra en la carpeta donde guardarás tu
@@ -47,6 +51,29 @@ En Windows nativo, descarga el ZIP desde GitHub y copia la carpeta `include` a:
 C:\cpp-libs\cpp_printer\include\cpp_printer\print.hpp
 ```
 
+Si usas MSYS2/UCRT64, instala con PowerShell y después abre la terminal
+**MSYS2 UCRT64** para compilar. No ejecutes el comando de PowerShell dentro de
+WSL:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
+```
+
+El instalador de Windows coloca los headers en:
+
+```text
+C:\msys64\ucrt64\include\cpp_printer
+```
+
+Comprueba la instalación antes de continuar:
+
+```powershell
+Test-Path C:\msys64\ucrt64\include\cpp_printer\print.hpp
+```
+
+Debe responder `True`.
+
 ### 3. Crea `main.cpp`
 
 Crea un archivo llamado `main.cpp` en la carpeta del ejemplo y pega:
@@ -57,11 +84,15 @@ Crea un archivo llamado `main.cpp` en la carpeta del ejemplo y pega:
 
 int main()
 {
-	std::vector<int> values = {1, 2, 3};
-	cpp_printer::cout_vector("values", values);
-	return 0;
+    std::vector<int> values = {1, 2, 3};
+    cpp_printer::cout_vector("values", values);
+    return 0;
 }
 ```
+
+La línea `cout_vector` es importante: declarar un vector no lo imprime. El
+programa puede compilar y no mostrar nada si creas los datos pero nunca llamas
+a una función de `cpp_printer`.
 
 ### 4. Compila desde la terminal
 
@@ -76,6 +107,14 @@ En Windows nativo con MinGW desde PowerShell, indica dónde están los headers:
 
 ```bash
 g++ -std=c++17 main.cpp -I C:/cpp-libs/cpp_printer/include -o main.exe
+```
+
+Si instalaste mediante el instalador de MSYS2/UCRT64, puedes compilar sin `-I`
+desde la terminal **MSYS2 UCRT64**:
+
+```bash
+g++ -std=c++17 main.cpp -o main.exe
+./main.exe
 ```
 
 Desde MSYS2 usa la ruta `/c`:
@@ -141,6 +180,34 @@ La salida será similar a:
 ```text
 values = {1, 2, 3}
 ```
+
+### Si compila pero no muestra nada
+
+Revisa que tu `main.cpp` tenga una llamada de impresión:
+
+```cpp
+cpp_printer::cout_vector("values", values);
+```
+
+También confirma que estás ejecutando el programa que acabas de compilar:
+
+```bash
+g++ -std=c++17 main.cpp -o main.exe
+./main.exe
+```
+
+En PowerShell usa `\.\main.exe`. En WSL o MSYS2 usa `./main.exe`.
+
+Si aparece `cpp_printer/print.hpp: No such file or directory`, el compilador no
+está usando el mismo entorno donde instalaste la biblioteca. Comprueba:
+
+```bash
+g++ --version
+```
+
+`Ubuntu` indica WSL; `mingw` o `MSYS2` indica Windows nativo. No mezcles una
+ruta `/mnt/c/...` con un compilador MinGW ni una ruta `C:/...` con el `g++` de
+Ubuntu.
 
 ### 6. Usa el CLI y la documentación
 

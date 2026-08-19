@@ -197,6 +197,62 @@ g++ -std=c++17 main.cpp -o app
 
 ## Uso básico
 
+### Tutorial humano: de cero a la primera impresión
+
+Antes de instalar, decide dónde vas a compilar. WSL/Linux, PowerShell y MSYS2
+son entornos diferentes y no comparten automáticamente sus rutas de headers.
+Un prompt `bluenova@Studio` indica WSL; un prompt `PS C:\` indica PowerShell.
+
+En WSL/Linux:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+mkdir -p ~/cpp-printer-example
+cd ~/cpp-printer-example
+```
+
+En Windows nativo con MSYS2/UCRT64, instala desde PowerShell:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
+```
+
+Luego abre MSYS2 UCRT64 y trabaja desde allí. La biblioteca queda en
+`C:\msys64\ucrt64\include\cpp_printer`.
+
+Crea `main.cpp` con una llamada real al impresor:
+
+```cpp
+#include <cpp_printer/print.hpp>
+#include <vector>
+
+int main()
+{
+	std::vector<int> values = {1, 2, 3};
+	cpp_printer::cout_vector("values", values);
+}
+```
+
+En WSL compila con:
+
+```bash
+g++ -std=c++17 main.cpp -o main
+./main
+```
+
+En MSYS2 UCRT64 compila con:
+
+```bash
+g++ -std=c++17 main.cpp -o main.exe
+./main.exe
+```
+
+Si el programa compila pero no imprime nada, normalmente falta la llamada
+`cpp_printer::cout_vector(...)`; declarar un vector por sí solo no produce
+salida. Si falta el header, comprueba que `g++` y la terminal pertenecen al
+mismo entorno.
+
 La forma más sencilla de incluir todas las funciones es:
 
 ```cpp
