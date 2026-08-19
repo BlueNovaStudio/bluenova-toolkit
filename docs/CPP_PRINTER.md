@@ -46,6 +46,15 @@ Por defecto se instala en `~/.local`. Compila incluyendo sus headers con:
 c++ -std=c++17 -I"$HOME/.local/include" main.cpp -o app
 ```
 
+Esta instalación es global para tu usuario. C++ no utiliza un entorno virtual
+equivalente a `.venv`. Para aislar la biblioteca en un proyecto concreto:
+
+```bash
+mkdir -p .deps
+CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh)
+c++ -std=c++17 -I"$PWD/.deps/include" main.cpp -o app
+```
+
 ## Uso básico
 
 La forma más sencilla de incluir todas las funciones es:

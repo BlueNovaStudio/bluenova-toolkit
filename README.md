@@ -36,6 +36,23 @@ Después, compila tu proyecto incluyendo los headers instalados:
 c++ -std=c++17 -I"$HOME/.local/include" main.cpp -o app
 ```
 
+La instalación anterior es global para tu usuario y queda disponible para todos
+los proyectos. No existe un entorno virtual equivalente a `.venv` para headers
+C++.
+
+Si prefieres aislarla dentro de un solo proyecto, instala en una carpeta local:
+
+```bash
+mkdir -p .deps
+CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh)
+```
+
+Y compila ese proyecto con:
+
+```bash
+c++ -std=c++17 -I"$PWD/.deps/include" main.cpp -o app
+```
+
 También puedes inspeccionar el script antes de ejecutarlo o cambiar el destino:
 
 ```bash
