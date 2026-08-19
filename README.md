@@ -19,8 +19,8 @@ mkdir -p ~/cpp-printer-example
 cd ~/cpp-printer-example
 ```
 
-En Windows nativo, abre PowerShell, Git Bash o la terminal de MSYS2 y entra en
-una carpeta equivalente:
+En Windows nativo, abre PowerShell o la terminal de MSYS2 y entra en una carpeta
+equivalente. No mezcles esta terminal con WSL:
 
 ```powershell
 mkdir C:\cpp-printer-example
@@ -72,11 +72,55 @@ escribir una ruta adicional:
 g++ -std=c++17 main.cpp -o main
 ```
 
-En Windows nativo con MinGW/MSYS2, indica dónde están los headers:
+En Windows nativo con MinGW desde PowerShell, indica dónde están los headers:
 
 ```bash
 g++ -std=c++17 main.cpp -I C:/cpp-libs/cpp_printer/include -o main.exe
 ```
+
+Desde MSYS2 usa la ruta `/c`:
+
+```bash
+g++ -std=c++17 main.cpp -I /c/cpp-libs/cpp_printer/include -o main.exe
+./main.exe
+```
+
+Desde WSL usa la ruta `/mnt/c` para acceder al mismo archivo de Windows:
+
+```bash
+g++ -std=c++17 main.cpp -I /mnt/c/cpp-libs/cpp_printer/include -o main
+./main
+```
+
+Usa esta tabla para elegir correctamente:
+
+| Entorno y compilador | Ruta de headers | Ejecutable |
+| --- | --- | --- |
+| WSL + g++ de Ubuntu | `/mnt/c/cpp-libs/cpp_printer/include` | `main` |
+| PowerShell + MinGW | `C:/cpp-libs/cpp_printer/include` | `main.exe` |
+| MSYS2 + MinGW | `/c/cpp-libs/cpp_printer/include` | `main.exe` |
+
+Comprueba que el header exista antes de compilar. En PowerShell:
+
+```powershell
+Test-Path C:\cpp-libs\cpp_printer\include\cpp_printer\print.hpp
+```
+
+En MSYS2:
+
+```bash
+ls /c/cpp-libs/cpp_printer/include/cpp_printer/print.hpp
+```
+
+En WSL:
+
+```bash
+ls /mnt/c/cpp-libs/cpp_printer/include/cpp_printer/print.hpp
+```
+
+El resultado debe ser `True` en PowerShell o mostrar el archivo en las otras
+terminales. Si `g++ --version` muestra Ubuntu, usa las rutas WSL; si muestra
+MinGW, usa las rutas Windows/MSYS2.
 
 ### 5. Ejecuta el programa
 
