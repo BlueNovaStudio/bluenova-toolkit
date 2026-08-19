@@ -3,6 +3,138 @@
 Biblioteca header-only para imprimir contenedores habituales de la STL de C++ con
 un formato legible y colores inspirados en Dracula.
 
+## Tutorial paso a paso
+
+Este tutorial muestra cómo instalar `cpp_printer`, crear un archivo C++ y
+compilarlo desde la terminal. La forma más sencilla es usar WSL/Linux con
+`g++`; en Windows nativo consulta la sección [Windows nativo](#windows-nativo).
+
+### 1. Abre el entorno de desarrollo
+
+En WSL, abre una terminal Ubuntu y entra en la carpeta donde guardarás tu
+archivo:
+
+```bash
+mkdir -p ~/cpp-printer-example
+cd ~/cpp-printer-example
+```
+
+En Windows nativo, abre PowerShell, Git Bash o la terminal de MSYS2 y entra en
+una carpeta equivalente:
+
+```powershell
+mkdir C:\cpp-printer-example
+cd C:\cpp-printer-example
+```
+
+### 2. Instala la biblioteca
+
+En WSL/Linux instala los headers globalmente para tu usuario del sistema:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```
+
+Comprueba que la instalación exista:
+
+```bash
+ls /usr/local/include/cpp_printer/print.hpp
+```
+
+En Windows nativo, descarga el ZIP desde GitHub y copia la carpeta `include` a:
+
+```text
+C:\cpp-libs\cpp_printer\include\cpp_printer\print.hpp
+```
+
+### 3. Crea `main.cpp`
+
+Crea un archivo llamado `main.cpp` en la carpeta del ejemplo y pega:
+
+```cpp
+#include <cpp_printer/print.hpp>
+#include <vector>
+
+int main()
+{
+	std::vector<int> values = {1, 2, 3};
+	cpp_printer::cout_vector("values", values);
+	return 0;
+}
+```
+
+### 4. Compila desde la terminal
+
+En WSL/Linux, como los headers están en `/usr/local/include`, no necesitas
+escribir una ruta adicional:
+
+```bash
+g++ -std=c++17 main.cpp -o main
+```
+
+En Windows nativo con MinGW/MSYS2, indica dónde están los headers:
+
+```bash
+g++ -std=c++17 main.cpp -I C:/cpp-libs/cpp_printer/include -o main.exe
+```
+
+### 5. Ejecuta el programa
+
+En WSL/Linux:
+
+```bash
+./main
+```
+
+En Windows:
+
+```bash
+./main.exe
+```
+
+La salida será similar a:
+
+```text
+values = {1, 2, 3}
+```
+
+### 6. Usa el CLI y la documentación
+
+El comando `cpp_printer` muestra el mensaje inicial. Si instalaste el proyecto
+completo con CMake, puedes ejecutar:
+
+```bash
+cpp_printer
+cpp_printer helpme
+```
+
+`helpme` copia `CPP_PRINTER.md` al directorio actual. Si estás dentro del árbol
+del proyecto, también puedes usar el ejecutable de desarrollo:
+
+```bash
+./build/cpp_printer
+./build/cpp_printer helpme
+```
+
+### 7. Actualiza la biblioteca
+
+Cuando se publique una actualización, reinstala los headers:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```
+
+Después recompila tu programa:
+
+```bash
+g++ -std=c++17 main.cpp -o main
+./main
+```
+
+La biblioteca no busca archivos automáticamente: el compilador debe conocer la
+ruta de los headers. En WSL se usa `/usr/local/include`; en Windows nativo se
+usa `-I C:/cpp-libs/cpp_printer/include` o la configuración de VS Code.
+
 ## Requisitos
 
 - C++17 o superior.
