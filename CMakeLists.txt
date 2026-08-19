@@ -25,6 +25,11 @@ include(GNUInstallDirs)
 
 add_library(cpp_printer_library INTERFACE)
 
+set_target_properties(cpp_printer_library
+    PROPERTIES
+        EXPORT_NAME cpp_printer
+)
+
 target_include_directories(cpp_printer_library
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -104,6 +109,7 @@ install(
 install(
     FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/docs/CPP_PRINTER.md
+        ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
     DESTINATION
         ${CMAKE_INSTALL_DATADIR}/cpp_printer
 )
@@ -122,9 +128,15 @@ configure_package_config_file(
         ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_printer
 )
 
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/cpp_printerConfigVersion.cmake
+    COMPATIBILITY SameMajorVersion
+)
+
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/cpp_printerConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/cpp_printerConfigVersion.cmake
     DESTINATION
         ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_printer
 )
