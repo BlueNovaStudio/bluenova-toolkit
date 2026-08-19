@@ -23,6 +23,51 @@ int main()
 
 ## Instalación rápida
 
+### Actualizar una instalación existente
+
+Si ya instalaste `cpp_printer`, vuelve a ejecutar el instalador para descargar
+los cambios más recientes de `main`.
+
+En WSL o Linux, si la instalación está en `/usr/local/include`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```
+
+Si la instalaste para tu usuario en `~/.local`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
+```
+
+Si quedaron archivos antiguos, limpia la carpeta y reinstala:
+
+```bash
+sudo rm -rf /usr/local/include/cpp_printer
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```
+
+Comprueba la instalación con:
+
+```bash
+ls /usr/local/include/cpp_printer/print.hpp
+```
+
+Después recompila tu archivo normalmente:
+
+```bash
+g++ -std=c++17 main.cpp -o main
+./main
+```
+
+En Windows nativo, vuelve a descargar el ZIP de GitHub y reemplaza la carpeta:
+
+```text
+C:\cpp-libs\cpp_printer\include\cpp_printer
+```
+
+Después vuelve a ejecutar la tarea **Build main.cpp** de VS Code.
+
 ### Windows nativo
 
 En Windows nativo, descarga el repositorio como ZIP desde GitHub y extrae la

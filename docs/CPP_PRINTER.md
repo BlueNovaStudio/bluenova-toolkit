@@ -17,6 +17,39 @@ de C++.
 
 ## Instalación y compilación
 
+### Actualizar una instalación existente
+
+Para actualizar una instalación en WSL o Linux, ejecuta nuevamente el instalador.
+Si se instaló en `/usr/local/include`, usa:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```
+
+Para una instalación en `~/.local`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
+```
+
+Si es necesario eliminar la versión anterior:
+
+```bash
+sudo rm -rf /usr/local/include/cpp_printer
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```
+
+Luego recompila el archivo del usuario:
+
+```bash
+g++ -std=c++17 main.cpp -o main
+./main
+```
+
+En Windows nativo, descarga de nuevo el ZIP y reemplaza la carpeta
+`C:\cpp-libs\cpp_printer\include\cpp_printer`, después ejecuta otra vez la
+tarea **Build main.cpp** de VS Code.
+
 ### Windows nativo
 
 En Windows nativo, descarga el repositorio como ZIP y copia la carpeta `include`
