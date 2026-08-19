@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(cpp_printer
-    VERSION 1.0.0
+    VERSION 1.0.1
     DESCRIPTION "A lightweight C++ STL container printer"
     LANGUAGES CXX
 )
@@ -17,6 +17,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(GNUInstallDirs)
+
+option(CPP_PRINTER_BUILD_CLI "Build and install the cpp_printer CLI" ON)
 
 
 # --------------------------------------------------
@@ -43,20 +45,22 @@ add_library(cpp_printer::cpp_printer ALIAS cpp_printer_library)
 # CLI
 # --------------------------------------------------
 
-add_executable(cpp_printer
-    cli/main.cpp
-    src/executable_path.cpp
-)
+if(CPP_PRINTER_BUILD_CLI)
+    add_executable(cpp_printer
+        cli/main.cpp
+        src/executable_path.cpp
+    )
 
-target_link_libraries(cpp_printer
-    PRIVATE
-        cpp_printer::cpp_printer
-)
+    target_link_libraries(cpp_printer
+        PRIVATE
+            cpp_printer::cpp_printer
+    )
 
-set_target_properties(cpp_printer
-    PROPERTIES
-        OUTPUT_NAME cpp_printer
-)
+    set_target_properties(cpp_printer
+        PROPERTIES
+            OUTPUT_NAME cpp_printer
+    )
+endif()
 
 # --------------------------------------------------
 # Tests
@@ -88,11 +92,13 @@ install(
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(
-    TARGETS cpp_printer
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    RENAME cpp_printer
-)
+if(CPP_PRINTER_BUILD_CLI)
+    install(
+        TARGETS cpp_printer
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        RENAME cpp_printer
+    )
+endif()
 
 install(
     TARGETS cpp_printer_library
