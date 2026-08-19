@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/bluenova/projects/cpp_printer/build",
+  "command": "/usr/bin/g++  -I/home/bluenova/projects/cpp_printer/include -g -std=c++17 -o CMakeFiles/cpp_printer.dir/cli/main.cpp.o -c /home/bluenova/projects/cpp_printer/cli/main.cpp",
+  "file": "/home/bluenova/projects/cpp_printer/cli/main.cpp",
+  "output": "CMakeFiles/cpp_printer.dir/cli/main.cpp.o"
+},
+{
+  "directory": "/home/bluenova/projects/cpp_printer/build",
+  "command": "/usr/bin/g++  -I/home/bluenova/projects/cpp_printer/include -g -std=c++17 -o CMakeFiles/cpp_printer.dir/src/executable_path.cpp.o -c /home/bluenova/projects/cpp_printer/src/executable_path.cpp",
+  "file": "/home/bluenova/projects/cpp_printer/src/executable_path.cpp",
+  "output": "CMakeFiles/cpp_printer.dir/src/executable_path.cpp.o"
+}
+]
