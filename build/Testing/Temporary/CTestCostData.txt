@@ -1,2 +1,0 @@
-cpp_printer_tests 1 0.00242506
----

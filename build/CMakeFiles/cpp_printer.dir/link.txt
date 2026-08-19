@@ -1,1 +1,0 @@
-/usr/bin/g++ -g CMakeFiles/cpp_printer.dir/cli/main.cpp.o CMakeFiles/cpp_printer.dir/src/executable_path.cpp.o -o cpp_printer 

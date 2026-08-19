@@ -1,7 +1,0 @@
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/cpp_printer.dir
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/edit_cache.dir
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/rebuild_cache.dir
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/list_install_components.dir
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/install.dir
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/install/local.dir
-/home/bluenova/projects/cpp_printer/build/CMakeFiles/install/strip.dir
