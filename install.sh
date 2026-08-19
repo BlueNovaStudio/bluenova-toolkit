@@ -3,7 +3,14 @@ set -euo pipefail
 
 REPOSITORY="${CPP_PRINTER_REPOSITORY:-https://github.com/BlueNovaStudio/bluenova-toolkit.git}"
 REF="${CPP_PRINTER_REF:-main}"
-PREFIX="${CPP_PRINTER_PREFIX:-${HOME}/.local}"
+
+if [[ -n "${CPP_PRINTER_PREFIX:-}" ]]; then
+    PREFIX="${CPP_PRINTER_PREFIX}"
+elif [[ "${EUID}" -eq 0 ]]; then
+    PREFIX="/usr/local"
+else
+    PREFIX="${HOME}/.local"
+fi
 TEMP_DIR="$(mktemp -d)"
 
 cleanup()

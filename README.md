@@ -30,6 +30,25 @@ directorio personal con una sola línea:
 curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | bash
 ```
 
+Para compilar como una biblioteca del sistema, sin `-I` ni rutas adicionales,
+instálala en `/usr/local/include`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | sudo bash
+```
+
+Después cualquier archivo puede usarla directamente:
+
+```cpp
+#include <cpp_printer/print.hpp>
+```
+
+Y compilarse con:
+
+```bash
+g++ -std=c++17 main.cpp -o app
+```
+
 Después, compila tu proyecto incluyendo los headers instalados:
 
 ```bash

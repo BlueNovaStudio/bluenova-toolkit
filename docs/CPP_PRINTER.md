@@ -55,6 +55,20 @@ CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.
 c++ -std=c++17 -I"$PWD/.deps/include" main.cpp -o app
 ```
 
+Si quieres usarla como un header del sistema y compilar sin `-I`, instala con
+permisos administrativos:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | sudo bash
+```
+
+Esto instala los headers en `/usr/local/include/cpp_printer`. Después puedes
+compilar directamente:
+
+```bash
+g++ -std=c++17 main.cpp -o app
+```
+
 ## Uso básico
 
 La forma más sencilla de incluir todas las funciones es:
