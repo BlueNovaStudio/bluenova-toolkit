@@ -32,12 +32,22 @@ void show_helpme()
         return;
     }
 
-    const fs::path source =
+    const fs::path installed_documentation =
         executable.parent_path()
         / ".."
         / "share"
         / "cpp_printer"
         / "CPP_PRINTER.md";
+
+    const fs::path development_documentation =
+        executable.parent_path()
+        / ".."
+        / "docs"
+        / "CPP_PRINTER.md";
+
+    const fs::path source = fs::exists(installed_documentation)
+        ? installed_documentation
+        : development_documentation;
 
     const fs::path destination =
         fs::current_path() / "CPP_PRINTER.md";
@@ -46,8 +56,9 @@ void show_helpme()
     {
         std::cerr
             << "No se pudo encontrar la documentacion de cpp_printer.\n"
-            << "Ruta esperada:\n"
-            << fs::weakly_canonical(source) << '\n';
+            << "Rutas buscadas:\n"
+            << fs::weakly_canonical(installed_documentation) << '\n'
+            << fs::weakly_canonical(development_documentation) << '\n';
 
         return;
     }
