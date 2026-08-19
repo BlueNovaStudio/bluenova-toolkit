@@ -23,6 +23,81 @@ int main()
 
 ## Instalación rápida
 
+### Windows nativo
+
+En Windows nativo, descarga el repositorio como ZIP desde GitHub y extrae la
+carpeta `include` en una ubicación estable, por ejemplo:
+
+```text
+C:\cpp-libs\cpp_printer\include\cpp_printer\print.hpp
+```
+
+Tu archivo puede estar en cualquier carpeta, por ejemplo:
+
+```text
+C:\Users\paulo\Desktop\mi-programa\main.cpp
+```
+
+Si usas MinGW/MSYS2, compílalo indicando esa carpeta:
+
+```bash
+g++ -std=c++17 main.cpp -I C:/cpp-libs/cpp_printer/include -o main.exe
+./main.exe
+```
+
+En VS Code debes abrir la carpeta que contiene `main.cpp` y configurar el
+include path en `.vscode/c_cpp_properties.json`:
+
+```json
+{
+	"version": 4,
+	"configurations": [
+		{
+			"name": "Windows",
+			"compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+			"intelliSenseMode": "windows-gcc-x64",
+			"cppStandard": "c++17",
+			"includePath": [
+				"${workspaceFolder}/**",
+				"C:/cpp-libs/cpp_printer/include"
+			]
+		}
+	]
+}
+```
+
+La biblioteca no detecta automáticamente las carpetas: el compilador necesita
+conocer la ruta mediante `-I` o mediante la configuración de VS Code.
+
+Para que el botón **Run Build Task** compile ese archivo desde VS Code, crea
+`.vscode/tasks.json`:
+
+```json
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build main.cpp",
+			"type": "shell",
+			"command": "C:/msys64/ucrt64/bin/g++.exe",
+			"args": [
+				"-std=c++17",
+				"${file}",
+				"-I",
+				"C:/cpp-libs/cpp_printer/include",
+				"-o",
+				"${fileDirname}/${fileBasenameNoExtension}.exe"
+			],
+			"problemMatcher": ["$gcc"]
+		}
+	]
+}
+```
+
+Ejecuta la tarea con `Ctrl+Shift+B` y selecciona **Build main.cpp**.
+
+### WSL
+
 En Linux o macOS puedes instalar los headers y la configuración de CMake en tu
 directorio personal con una sola línea:
 

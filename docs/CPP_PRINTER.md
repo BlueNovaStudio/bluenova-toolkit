@@ -9,13 +9,82 @@ proporciona y aplican colores ANSI inspirados en el tema Dracula.
 ## Requisitos
 
 - Compilador compatible con C++17 o superior.
-- CMake 3.10 o superior para usar la configuración incluida.
+- CMake 3.20 o superior para usar la configuración incluida.
 - Una terminal compatible con colores ANSI truecolor para ver la paleta completa.
 
 La biblioteca no necesita dependencias externas: solo utiliza la biblioteca estándar
 de C++.
 
 ## Instalación y compilación
+
+### Windows nativo
+
+En Windows nativo, descarga el repositorio como ZIP y copia la carpeta `include`
+en una ubicación estable, por ejemplo:
+
+```text
+C:\cpp-libs\cpp_printer\include\cpp_printer\print.hpp
+```
+
+El proyecto del usuario puede estar en cualquier otra carpeta. Con MinGW/MSYS2:
+
+```bash
+g++ -std=c++17 main.cpp -I C:/cpp-libs/cpp_printer/include -o main.exe
+./main.exe
+```
+
+En VS Code, abre la carpeta que contiene `main.cpp`. Para que IntelliSense y el
+botón de ejecución conozcan la biblioteca, añade esta ruta a
+`.vscode/c_cpp_properties.json`:
+
+```json
+{
+	"version": 4,
+	"configurations": [
+		{
+			"name": "Windows",
+			"compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+			"intelliSenseMode": "windows-gcc-x64",
+			"cppStandard": "c++17",
+			"includePath": [
+				"${workspaceFolder}/**",
+				"C:/cpp-libs/cpp_printer/include"
+			]
+		}
+	]
+}
+```
+
+`cpp_printer` no busca carpetas por sí misma; la ruta la configura el compilador.
+En WSL, abre el proyecto con **WSL: Reopen Folder in WSL** y usa la ruta Linux
+correspondiente, como `/usr/local/include` o `/mnt/c/...`.
+
+Para compilar un archivo suelto desde VS Code en Windows, crea
+`.vscode/tasks.json` con una tarea que incluya:
+
+```json
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build main.cpp",
+			"type": "shell",
+			"command": "C:/msys64/ucrt64/bin/g++.exe",
+			"args": [
+				"-std=c++17",
+				"${file}",
+				"-I",
+				"C:/cpp-libs/cpp_printer/include",
+				"-o",
+				"${fileDirname}/${fileBasenameNoExtension}.exe"
+			],
+			"problemMatcher": ["$gcc"]
+		}
+	]
+}
+```
+
+Después usa `Ctrl+Shift+B` y selecciona `Build main.cpp`.
 
 Incluye el directorio `include` en tu proyecto. Con CMake:
 
