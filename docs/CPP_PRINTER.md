@@ -52,6 +52,30 @@ tarea **Build main.cpp** de VS Code.
 
 ### Windows nativo
 
+Con Windows nativo y MSYS2/UCRT64, abre **PowerShell** e instala los headers en
+la carpeta del compilador:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
+```
+
+Después abre **MSYS2 UCRT64**, no WSL, y ejecuta:
+
+```bash
+cd /c/Users/paulo/OneDrive/Desktop/pruebaLIB
+g++ -std=c++17 main.cpp -o main.exe
+./main.exe
+```
+
+Por defecto el instalador copia los headers a:
+
+```text
+C:\msys64\ucrt64\include\cpp_printer
+```
+
+Si tu MinGW está en otra ubicación, usa el parámetro `-Prefix` del script.
+
 En Windows nativo, descarga el repositorio como ZIP y copia la carpeta `include`
 en una ubicación estable, por ejemplo:
 

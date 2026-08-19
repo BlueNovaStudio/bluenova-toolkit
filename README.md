@@ -246,6 +246,31 @@ Después vuelve a ejecutar la tarea **Build main.cpp** de VS Code.
 
 ### Windows nativo
 
+Si usas Windows nativo con MSYS2/UCRT64, abre **PowerShell** para instalar los
+headers directamente en el include de MinGW:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
+```
+
+Después abre la terminal **MSYS2 UCRT64**, entra en la carpeta de tu archivo y
+compila sin `-I`:
+
+```bash
+cd /c/Users/paulo/OneDrive/Desktop/pruebaLIB
+g++ -std=c++17 main.cpp -o main.exe
+./main.exe
+```
+
+Si tu compilador está instalado en otra carpeta, pasa esa ruta desde PowerShell:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1))) -Prefix "C:\ruta\de\tu\mingw"
+```
+
+El script instala por defecto en `C:\msys64\ucrt64\include\cpp_printer`.
+
 En Windows nativo, descarga el repositorio como ZIP desde GitHub y extrae la
 carpeta `include` en una ubicación estable, por ejemplo:
 
