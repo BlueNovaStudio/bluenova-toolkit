@@ -32,6 +32,20 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+### Instalación rápida desde GitHub
+
+En Linux o macOS puedes instalar los headers sin un gestor de paquetes:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | bash
+```
+
+Por defecto se instala en `~/.local`. Compila incluyendo sus headers con:
+
+```bash
+c++ -std=c++17 -I"$HOME/.local/include" main.cpp -o app
+```
+
 ## Uso básico
 
 La forma más sencilla de incluir todas las funciones es:

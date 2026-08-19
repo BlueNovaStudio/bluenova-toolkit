@@ -21,6 +21,28 @@ int main()
 }
 ```
 
+## Instalación rápida
+
+En Linux o macOS puedes instalar los headers y la configuración de CMake en tu
+directorio personal con una sola línea:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh | bash
+```
+
+Después, compila tu proyecto incluyendo los headers instalados:
+
+```bash
+c++ -std=c++17 -I"$HOME/.local/include" main.cpp -o app
+```
+
+También puedes inspeccionar el script antes de ejecutarlo o cambiar el destino:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/bluenova-toolkit/main/install.sh -o install.sh
+CPP_PRINTER_PREFIX="$HOME/.local" bash install.sh
+```
+
 Compilación directa:
 
 ```bash
