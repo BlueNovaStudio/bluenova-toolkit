@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(cpp_printer
-    VERSION 1.0.2
+    VERSION 1.0.3
     DESCRIPTION "A lightweight C++ STL container printer"
     LANGUAGES CXX
 )
