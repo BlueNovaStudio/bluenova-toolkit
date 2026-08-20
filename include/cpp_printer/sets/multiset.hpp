@@ -9,7 +9,7 @@
 namespace cpp_printer
 {
     template <typename T>
-    void cout_multiset(const std::string& name_multiset, const std::multiset<T> container)
+    void cout_multiset(const std::string& name_multiset, const std::multiset<T>& container)
     {
         detail::print_name(std::cout, name_multiset);
         detail::print_syntax(std::cout, " = [");

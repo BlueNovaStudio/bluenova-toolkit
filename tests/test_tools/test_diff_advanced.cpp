@@ -3,12 +3,32 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <cassert>
 #include <cctype>
 #include "../include/tools/diff.hpp"
 
 using namespace cpp_printer;
+
+struct HashOnlyKey {
+    int id;
+};
+
+inline bool operator==(const HashOnlyKey& lhs, const HashOnlyKey& rhs) {
+    return lhs.id == rhs.id;
+}
+
+inline std::ostream& operator<<(std::ostream& output, const HashOnlyKey& key) {
+    return output << key.id;
+}
+
+struct HashOnlyKeyHash {
+    std::size_t operator()(const HashOnlyKey& key) const noexcept {
+        return std::hash<int>{}(key.id);
+    }
+};
 
 template<typename Func>
 std::string capture_output(Func func) {
@@ -121,6 +141,25 @@ void test_diff_identical() {
     std::cout << "PASSED\n";
 }
 
+void test_diff_unordered_hash_only_keys() {
+    std::cout << "Testing diff with unordered hash-only keys... ";
+    std::unordered_map<HashOnlyKey, int, HashOnlyKeyHash> left = {{{1}, 10}};
+    std::unordered_map<HashOnlyKey, int, HashOnlyKeyHash> right = {{{2}, 20}};
+    auto output = capture_output([&]() { cout_diff("left", left, "right", right); });
+    assert(output.find("- 1 → 10") != std::string::npos);
+    assert(output.find("+ 2 → 20") != std::string::npos);
+    std::cout << "PASSED\n";
+}
+
+void test_diff_unordered_multiset_multiplicity() {
+    std::cout << "Testing diff with unordered multiset multiplicity... ";
+    std::unordered_multiset<int> left = {1, 1, 2};
+    std::unordered_multiset<int> right = {1, 2};
+    auto output = capture_output([&]() { cout_diff("left", left, "right", right); });
+    assert(output.find("- 1") != std::string::npos);
+    std::cout << "PASSED\n";
+}
+
 void run_all_tests() {
     std::cout << "\n=== Running Diff Advanced Tests ===\n\n";
     test_diff_added_element();
@@ -132,6 +171,8 @@ void run_all_tests() {
     test_diff_one_empty();
     test_diff_strings();
     test_diff_identical();
+    test_diff_unordered_hash_only_keys();
+    test_diff_unordered_multiset_multiplicity();
     std::cout << "\n✓ All diff tests passed!\n";
 }
 

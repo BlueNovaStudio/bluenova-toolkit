@@ -3,6 +3,7 @@
 #include <array>
 #include <deque>
 #include <list>
+#include <forward_list>
 #include <map>
 #include <set>
 #include <type_traits>
@@ -69,6 +70,8 @@ namespace cpp_printer::detail
     struct is_ordered_sequence<std::deque<Value, Allocator>> : std::true_type {};
     template <typename Value, typename Allocator>
     struct is_ordered_sequence<std::list<Value, Allocator>> : std::true_type {};
+    template <typename Value, typename Allocator>
+    struct is_ordered_sequence<std::forward_list<Value, Allocator>> : std::true_type {};
     template <typename Value, std::size_t Size>
     struct is_ordered_sequence<std::array<Value, Size>> : std::true_type {};
 

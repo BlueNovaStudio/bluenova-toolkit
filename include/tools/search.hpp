@@ -19,7 +19,7 @@ namespace cpp_printer
 
         bool first = true;
         std::size_t index = 0;
-        std::vector<std::size_t> match_indices;
+        std::size_t match_count = 0;
 
         for (; it != end; ++it, ++index)
         {
@@ -30,7 +30,7 @@ namespace cpp_printer
             if (*it == target)
             {
                 detail::print_highlight_value(std::cout, *it);
-                match_indices.push_back(index);
+                ++match_count;
             }
             else
             {
@@ -43,7 +43,7 @@ namespace cpp_printer
         detail::print_syntax(std::cout, "}\n");
 
         // Resumen de búsqueda
-        if (match_indices.empty())
+        if (match_count == 0)
         {
             detail::print_syntax(std::cout, "  └─ Elemento ");
             detail::print_highlight_value(std::cout, target);
@@ -52,12 +52,16 @@ namespace cpp_printer
         else
         {
             detail::print_syntax(std::cout, "  └─ Encontrado en índice(s): [");
-            for (std::size_t i = 0; i < match_indices.size(); ++i)
+            bool first_match = true;
+            index = 0;
+            for (auto match_it = std::begin(container); match_it != std::end(container);
+                 ++match_it, ++index)
             {
-                if (i > 0) detail::print_syntax(std::cout, ", ");
-                // Keep the closing bracket adjacent to the final index in the
-                // plain stream as well as in coloured terminal output.
-                std::cout << match_indices[i];
+                if (*match_it == target) {
+                    if (!first_match) detail::print_syntax(std::cout, ", ");
+                    std::cout << index;
+                    first_match = false;
+                }
             }
             std::cout << "]\n";
         }

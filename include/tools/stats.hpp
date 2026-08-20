@@ -17,7 +17,9 @@ namespace cpp_printer
     struct stats_is_comparable : std::false_type {};
 
     template <typename T>
-    struct stats_is_comparable<T, std::void_t<decltype(std::declval<T>() < std::declval<T>())>>
+    struct stats_is_comparable<T, std::void_t<
+        decltype(std::declval<const T&>() < std::declval<const T&>()),
+        decltype(std::declval<const T&>() > std::declval<const T&>())>>
         : std::true_type {};
 
     template <typename Container>
@@ -68,33 +70,19 @@ namespace cpp_printer
         auto end = std::end(container);
         
         using ElementType = std::remove_cv_t<std::remove_reference_t<decltype(*it)>>;
-        using ValueType = typename std::iterator_traits<decltype(it)>::value_type;
         
         // Verificar si el tipo es numérico
         constexpr bool is_numeric = std::is_arithmetic_v<ElementType>;
-        constexpr bool is_comparable = stats_is_comparable<ElementType>::value;
-        
-        // Inicializar min/max (solo si es comparable)
-        ElementType min_val = *it;
-        ElementType max_val = *it;
+        constexpr bool is_comparable = stats_is_comparable<ElementType>::value &&
+                                       std::is_copy_constructible_v<ElementType> &&
+                                       std::is_copy_assignable_v<ElementType>;
         
         std::size_t size = 0;
-        double suma = 0.0;
+        long double suma = 0.0L;
         
         // Primer pase: calcular métricas
-        for (; it != end; ++it)
-        {
-            const auto& elem = *it;
-            
-            if constexpr (is_numeric) {
-                suma += static_cast<double>(elem);
-            }
-            
-            if constexpr (is_comparable) {
-                if (elem < min_val) min_val = elem;
-                if (elem > max_val) max_val = elem;
-            }
-            
+        for (; it != end; ++it) {
+            if constexpr (is_numeric) suma += static_cast<long double>(*it);
             ++size;
         }
         
@@ -111,7 +99,7 @@ namespace cpp_printer
         print_row("Tamaño  ", size);
         
         if constexpr (is_numeric) {
-            double promedio = (size > 0) ? (suma / static_cast<double>(size)) : 0.0;
+            const long double promedio = suma / static_cast<long double>(size);
             print_row("Suma    ", suma);
             print_row("Promedio", promedio);
         } else {
@@ -119,6 +107,12 @@ namespace cpp_printer
         }
         
         if constexpr (is_comparable) {
+            auto min_val = *std::begin(container);
+            auto max_val = min_val;
+            for (const auto& elem : container) {
+                if (elem < min_val) min_val = elem;
+                if (elem > max_val) max_val = elem;
+            }
             print_row("Mínimo  ", min_val);
             print_row("Máximo  ", max_val, true);
         } else {
@@ -140,38 +134,23 @@ namespace cpp_printer
         using MappedType = typename Container::mapped_type;
         
         const std::size_t size = container.size();
-        double suma_keys = 0.0;
-        double suma_values = 0.0;
-        
-        KeyType min_key = it->first;
-        KeyType max_key = it->first;
+        long double suma_keys = 0.0L;
+        long double suma_values = 0.0L;
         
         // Solo si las claves son numéricas
         constexpr bool key_is_numeric = std::is_arithmetic_v<KeyType>;
         constexpr bool value_is_numeric = std::is_arithmetic_v<MappedType>;
-        
-        // Primer elemento para valores (si son numéricos)
-        MappedType min_value = it->second;
-        MappedType max_value = it->second;
         
         for (; it != end; ++it)
         {
             const auto& [key, value] = *it;
             
             if constexpr (key_is_numeric) {
-                suma_keys += static_cast<double>(key);
+                suma_keys += static_cast<long double>(key);
             }
             
             if constexpr (value_is_numeric) {
-                suma_values += static_cast<double>(value);
-            }
-            
-            if (key < min_key) min_key = key;
-            if (key > max_key) max_key = key;
-            
-            if constexpr (value_is_numeric) {
-                if (value < min_value) min_value = value;
-                if (value > max_value) max_value = value;
+                suma_values += static_cast<long double>(value);
             }
         }
         
@@ -184,16 +163,29 @@ namespace cpp_printer
         };
         
         print_row("Tamaño (pares)", size);
-        print_row("Clave mínima  ", min_key);
-        print_row("Clave máxima  ", max_key);
-        
         if constexpr (key_is_numeric) {
-            double avg_key = (size > 0) ? (suma_keys / static_cast<double>(size)) : 0.0;
+            auto min_key = std::begin(container)->first;
+            auto max_key = min_key;
+            for (const auto& entry : container) {
+                min_key = std::min(min_key, entry.first);
+                max_key = std::max(max_key, entry.first);
+            }
+            print_row("Clave mínima  ", min_key);
+            print_row("Clave máxima  ", max_key);
+            const long double avg_key = suma_keys / static_cast<long double>(size);
             print_row("Promedio clave", avg_key);
+        } else {
+            detail::print_syntax(std::cout, "  ├─ Claves no ordenables numéricamente\n");
         }
         
         if constexpr (value_is_numeric) {
-            double avg_value = (size > 0) ? (suma_values / static_cast<double>(size)) : 0.0;
+            auto min_value = std::begin(container)->second;
+            auto max_value = min_value;
+            for (const auto& entry : container) {
+                min_value = std::min(min_value, entry.second);
+                max_value = std::max(max_value, entry.second);
+            }
+            const long double avg_value = suma_values / static_cast<long double>(size);
             print_row("Valor mínimo  ", min_value);
             print_row("Valor máximo  ", max_value);
             print_row("Promedio valor", avg_value, true);
@@ -215,9 +207,7 @@ namespace cpp_printer
         using ElementType = typename Container::value_type;
         
         const std::size_t size = container.size();
-        ElementType min_val = *it;
-        ElementType max_val = *it;
-        double suma = 0.0;
+        long double suma = 0.0L;
         
         constexpr bool is_numeric = std::is_arithmetic_v<ElementType>;
         
@@ -226,11 +216,8 @@ namespace cpp_printer
             const auto& elem = *it;
             
             if constexpr (is_numeric) {
-                suma += static_cast<double>(elem);
+                suma += static_cast<long double>(elem);
             }
-            
-            if (elem < min_val) min_val = elem;
-            if (elem > max_val) max_val = elem;
         }
         
         auto print_row = [](const char* label, const auto& val, bool is_last = false) {
@@ -242,11 +229,16 @@ namespace cpp_printer
         };
         
         print_row("Tamaño (claves únicas)", size);
-        print_row("Mínimo  ", min_val);
-        print_row("Máximo  ", max_val);
-        
         if constexpr (is_numeric) {
-            double promedio = (size > 0) ? (suma / static_cast<double>(size)) : 0.0;
+            auto min_val = *std::begin(container);
+            auto max_val = min_val;
+            for (const auto& elem : container) {
+                min_val = std::min(min_val, elem);
+                max_val = std::max(max_val, elem);
+            }
+            print_row("Mínimo  ", min_val);
+            print_row("Máximo  ", max_val);
+            const long double promedio = suma / static_cast<long double>(size);
             print_row("Suma    ", suma);
             print_row("Promedio", promedio, true);
         } else {

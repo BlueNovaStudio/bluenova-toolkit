@@ -14,6 +14,20 @@
 
 using namespace cpp_printer;
 
+struct HashOnlyKey {
+    int id;
+};
+
+inline bool operator==(const HashOnlyKey& lhs, const HashOnlyKey& rhs) {
+    return lhs.id == rhs.id;
+}
+
+struct HashOnlyKeyHash {
+    std::size_t operator()(const HashOnlyKey& key) const noexcept {
+        return std::hash<int>{}(key.id);
+    }
+};
+
 // Helper para capturar salida
 template<typename Func>
 std::string capture_output(Func func) {
@@ -138,6 +152,16 @@ void test_stats_map() {
     std::cout << "PASSED\n";
 }
 
+void test_stats_unordered_map_with_hash_only_keys() {
+    std::cout << "Testing stats with unordered map hash-only keys... ";
+    std::unordered_map<HashOnlyKey, int, HashOnlyKeyHash> values = {{{1}, 10}, {{2}, 20}};
+    auto output = capture_output([&]() { cout_stats("test", values); });
+    assert(output.find("Tamaño (pares): 2") != std::string::npos);
+    assert(output.find("Claves no ordenables numéricamente") != std::string::npos);
+    assert(output.find("Promedio valor: 15") != std::string::npos);
+    std::cout << "PASSED\n";
+}
+
 void test_stats_all_equal() {
     std::cout << "Testing stats with all equal values... ";
     std::vector<int> v = {7, 7, 7, 7, 7};
@@ -162,6 +186,7 @@ void run_all_tests() {
     test_stats_deque();
     test_stats_set();
     test_stats_map();
+    test_stats_unordered_map_with_hash_only_keys();
     test_stats_all_equal();
     std::cout << "\n✓ All stats tests passed!\n";
 }

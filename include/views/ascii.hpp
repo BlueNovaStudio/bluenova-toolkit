@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <algorithm>
 #include <limits>
+#include <iterator>
 #include "cpp_printer/detail/print_format.hpp"
 
 namespace cpp_printer
@@ -17,6 +18,13 @@ namespace cpp_printer
     inline void print_positive_bar(std::size_t blocks, const std::string& block_char);
     inline void print_negative_bar(std::size_t blocks, const std::string& block_char);
     inline void print_single_bar(std::size_t blocks, const std::string& block_char, bool is_negative);
+
+    inline std::size_t safe_block_count(double value, std::size_t limit)
+    {
+        if (!std::isfinite(value) || value <= 0.0 || limit == 0) return 0;
+        if (value >= static_cast<double>(limit)) return limit;
+        return static_cast<std::size_t>(std::lround(value));
+    }
 
     // ============================================================
     // CONFIGURACIÓN DEL GRÁFICO
@@ -129,7 +137,7 @@ namespace cpp_printer
                 // Normalización contra el máximo absoluto
                 if (max_abs > 0) {
                     double normalized = std::abs(static_cast<double>(num)) / max_abs;
-                    blocks = static_cast<std::size_t>(std::round(normalized * cfg.max_blocks));
+                    blocks = safe_block_count(normalized * static_cast<double>(cfg.max_blocks), cfg.max_blocks);
                 }
                 
                 // Para números negativos con dual bars, usar un separador
@@ -148,9 +156,8 @@ namespace cpp_printer
                 }
             } else {
                 // Sin normalización (usar escala absoluta)
-                // Esto puede generar barras muy largas
                 double abs_num = std::abs(static_cast<double>(num));
-                blocks = static_cast<std::size_t>(std::round(abs_num));
+                blocks = safe_block_count(abs_num, cfg.max_blocks);
                 
                 if (blocks > 0) {
                     if (is_negative) {

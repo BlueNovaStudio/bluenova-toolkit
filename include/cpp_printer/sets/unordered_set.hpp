@@ -9,7 +9,7 @@
 namespace cpp_printer
 {
     template <typename T>
-    void cout_unordered_set(const std::string& name_unordered_set, std::unordered_set<T> container)
+    void cout_unordered_set(const std::string& name_unordered_set, const std::unordered_set<T>& container)
     {
         detail::print_name(std::cout, name_unordered_set);
         detail::print_syntax(std::cout, " = [");

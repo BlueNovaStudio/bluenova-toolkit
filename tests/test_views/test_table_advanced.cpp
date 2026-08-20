@@ -127,6 +127,16 @@ void test_table_c_strings() {
     std::cout << "PASSED\n";
 }
 
+void test_char_array_without_terminator() {
+    std::cout << "Testing formatting of a non-terminated char array... ";
+    const char value[] = {'a', 'b', 'c'};
+    assert(detail::get_visible_length(value) == 5);
+    std::ostringstream output;
+    detail::print_value_formatted(output, value);
+    assert(output.str() == "\"abc\"");
+    std::cout << "PASSED\n";
+}
+
 void test_table_bool() {
     std::cout << "Testing table with booleans... ";
     std::vector<std::vector<bool>> matrix = {{true, false}, {false, true}};
@@ -201,6 +211,7 @@ void run_all_tests() {
     test_table_characters();
     test_table_negative_numbers();
     test_table_c_strings();
+    test_char_array_without_terminator();
     test_table_bool();
     test_table_floats();
     test_table_different_containers();

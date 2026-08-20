@@ -13,6 +13,24 @@
 
 using namespace cpp_printer;
 
+struct HashOnlyKey {
+    int id;
+};
+
+inline bool operator==(const HashOnlyKey& lhs, const HashOnlyKey& rhs) {
+    return lhs.id == rhs.id;
+}
+
+inline std::ostream& operator<<(std::ostream& output, const HashOnlyKey& key) {
+    return output << key.id;
+}
+
+struct HashOnlyKeyHash {
+    std::size_t operator()(const HashOnlyKey& key) const noexcept {
+        return std::hash<int>{}(key.id);
+    }
+};
+
 template<typename Func>
 std::string capture_output(Func func) {
     std::streambuf* old = std::cout.rdbuf();
@@ -127,6 +145,24 @@ void test_compare_empty_containers() {
     std::cout << "PASSED\n";
 }
 
+void test_compare_unordered_hash_only_keys() {
+    std::cout << "Testing compare with unordered hash-only keys... ";
+    std::unordered_map<HashOnlyKey, int, HashOnlyKeyHash> left = {{{1}, 10}, {{2}, 20}};
+    std::unordered_map<HashOnlyKey, int, HashOnlyKeyHash> right = {{{1}, 10}, {{2}, 30}};
+    auto output = capture_output([&]() { cout_compare("left", left, "right", right); });
+    assert(output.find("2: 20 != 30") != std::string::npos);
+    std::cout << "PASSED\n";
+}
+
+void test_compare_unordered_multiset_multiplicity() {
+    std::cout << "Testing compare with unordered multiset multiplicity... ";
+    std::unordered_multiset<int> left = {1, 1, 2};
+    std::unordered_multiset<int> right = {1, 2};
+    auto output = capture_output([&]() { cout_compare("left", left, "right", right); });
+    assert(output.find("1 <-> <ausente>") != std::string::npos);
+    std::cout << "PASSED\n";
+}
+
 void run_all_tests() {
     std::cout << "\n=== Running Compare Advanced Tests ===\n\n";
     test_compare_identical_vectors();
@@ -139,6 +175,8 @@ void run_all_tests() {
     test_compare_mixed_types();
     test_compare_strings();
     test_compare_empty_containers();
+    test_compare_unordered_hash_only_keys();
+    test_compare_unordered_multiset_multiplicity();
     std::cout << "\n✓ All compare tests passed!\n";
 }
 

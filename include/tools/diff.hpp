@@ -235,12 +235,46 @@ namespace cpp_printer
                    const std::string& name2, const Container2& c2)
     {
         if constexpr (detail::is_unordered_v<Container1> || detail::is_unordered_v<Container2>) {
-            using KeyType = typename Container1::key_type;
-            using MappedType1 = typename Container1::mapped_type;
-            using MappedType2 = typename Container2::mapped_type;
-            std::map<KeyType, MappedType1> map1(c1.begin(), c1.end());
-            std::map<KeyType, MappedType2> map2(c2.begin(), c2.end());
-            diff_maps_impl(name1, map1, name2, map2);
+            detail::print_name(std::cout, name1);
+            detail::print_syntax(std::cout, " vs ");
+            detail::print_name(std::cout, name2);
+            detail::print_syntax(std::cout, ":\n  (Comparando por clave, no por orden)\n");
+            bool has_differences = false;
+            for (const auto& [key, value] : c1) {
+                const auto found = c2.find(key);
+                if (found == c2.end()) {
+                    has_differences = true;
+                    detail::print_syntax(std::cout, "  ");
+                    std::cout << detail::color::error << "- ";
+                    detail::print_value(std::cout, key);
+                    std::cout << " → ";
+                    detail::print_value(std::cout, value);
+                    std::cout << detail::color::reset << "\n";
+                } else if (value != found->second) {
+                    has_differences = true;
+                    detail::print_value(std::cout, key);
+                    std::cout << ": " << detail::color::error;
+                    detail::print_value(std::cout, value);
+                    std::cout << detail::color::reset << " → " << detail::color::success;
+                    detail::print_value(std::cout, found->second);
+                    std::cout << detail::color::reset << "\n";
+                }
+            }
+            for (const auto& [key, value] : c2) {
+                if (c1.find(key) == c1.end()) {
+                    has_differences = true;
+                    detail::print_syntax(std::cout, "  ");
+                    std::cout << detail::color::success << "+ ";
+                    detail::print_value(std::cout, key);
+                    std::cout << " → ";
+                    detail::print_value(std::cout, value);
+                    std::cout << detail::color::reset << "\n";
+                }
+            }
+            if (!has_differences) {
+                std::cout << "  " << detail::color::success << "✓ Los mapas son idénticos."
+                          << detail::color::reset << "\n";
+            }
         } else {
             diff_maps_impl(name1, c1, name2, c2);
         }
@@ -254,11 +288,46 @@ namespace cpp_printer
     void diff_sets(const std::string& name1, const Container1& c1,
                    const std::string& name2, const Container2& c2)
     {
-        using ElementType = typename Container1::value_type;
-        
-        // Convertir a std::set para comparación ordenada
-        std::set<ElementType> set1(c1.begin(), c1.end());
-        std::set<ElementType> set2(c2.begin(), c2.end());
+        if constexpr (detail::is_unordered_v<Container1> || detail::is_unordered_v<Container2>) {
+            detail::print_name(std::cout, name1);
+            detail::print_syntax(std::cout, " vs ");
+            detail::print_name(std::cout, name2);
+            detail::print_syntax(std::cout, ":\n  (Comparando por contenido, no por orden)\n");
+
+            bool has_differences = false;
+            for (auto it = c1.begin(); it != c1.end();) {
+                const auto range = c1.equal_range(*it);
+                const auto count1 = c1.count(*it);
+                const auto count2 = c2.count(*it);
+                if (count1 > count2) {
+                    for (typename Container1::size_type i = 0; i < count1 - count2; ++i) {
+                        has_differences = true;
+                        print_diff_with_marker(*it, "- ", detail::color::error);
+                    }
+                }
+                it = range.second;
+            }
+            for (auto it = c2.begin(); it != c2.end();) {
+                const auto range = c2.equal_range(*it);
+                const auto count2 = c2.count(*it);
+                const auto count1 = c1.count(*it);
+                if (count2 > count1) {
+                    for (typename Container2::size_type i = 0; i < count2 - count1; ++i) {
+                        has_differences = true;
+                        print_diff_with_marker(*it, "+ ", detail::color::success);
+                    }
+                }
+                it = range.second;
+            }
+            if (!has_differences) {
+                std::cout << "  " << detail::color::success << "✓ Los sets son idénticos."
+                          << detail::color::reset << "\n";
+            }
+            return;
+        }
+
+        const Container1& set1 = c1;
+        const Container2& set2 = c2;
         
         detail::print_name(std::cout, name1);
         detail::print_syntax(std::cout, " vs ");

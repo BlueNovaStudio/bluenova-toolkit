@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <iomanip>
+#include <iterator>
 #include "cpp_printer/detail/print_format.hpp"
 
 namespace cpp_printer::detail {
@@ -22,7 +23,8 @@ namespace cpp_printer::detail {
         } else if constexpr (std::is_same_v<Value, const char*> || std::is_same_v<Value, char*>) {
             return (value ? std::strlen(value) : 4) + 2; // "null" es el caso especial
         } else if constexpr (std::is_array_v<Value> && std::is_same_v<std::remove_extent_t<Value>, char>) {
-            return std::strlen(value) + 2;
+            const auto terminator = std::find(std::begin(value), std::end(value), '\0');
+            return static_cast<std::size_t>(std::distance(std::begin(value), terminator)) + 2;
         } else if constexpr (std::is_same_v<Value, char>) {
             return 3; // Incluye comillas simples ' '
         } else if constexpr (std::is_same_v<Value, bool>) {
@@ -52,7 +54,10 @@ namespace cpp_printer::detail {
                 output << "null";
             }
         } else if constexpr (std::is_array_v<Value> && std::is_same_v<std::remove_extent_t<Value>, char>) {
-            output << "\"" << value << "\"";
+            const auto terminator = std::find(std::begin(value), std::end(value), '\0');
+            output << '"';
+            output.write(value, static_cast<std::streamsize>(std::distance(std::begin(value), terminator)));
+            output << '"';
         } else if constexpr (std::is_same_v<Value, char>) {
             output << "'" << value << "'";
         } else if constexpr (std::is_same_v<Value, bool>) {
