@@ -18,7 +18,10 @@ namespace cpp_printer::detail
         inline constexpr const char* keyword = "\033[38;2;255;121;198m";
         inline constexpr const char* function = "\033[38;2;139;233;253m";
         inline constexpr const char* comment = "\033[38;2;98;114;164m";
+        inline constexpr const char* error = "\033[38;2;255;85;85m";
+        inline constexpr const char* success = "\033[38;2;80;250;123m";
         inline constexpr const char* background = "\033[48;2;40;42;54m";
+        inline constexpr const char* yellow = "\033[38;2;241;250;140m";
     }
 
     inline void print_name(std::ostream& output, const std::string& value)
@@ -63,5 +66,21 @@ namespace cpp_printer::detail
         {
             output << value;
         }
+    }
+    template <typename T>
+    void print_highlight_value(std::ostream& output, const T& value)
+    {
+        using Value = std::remove_cv_t<std::remove_reference_t<T>>;
+
+        output << "\033[1;" << "38;2;241;250;140m"; // Negrita + Amarillo
+
+        if constexpr (std::is_same_v<Value, std::string>)
+            output << '"' << value << '"';
+        else if constexpr (std::is_same_v<Value, char>)
+            output << '\'' << value << '\'';
+        else
+            output << value;
+
+        output << color::reset;
     }
 }

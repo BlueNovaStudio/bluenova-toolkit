@@ -1,209 +1,158 @@
 # cpp_printer
 
-Biblioteca **header-only** para imprimir contenedores habituales de la STL de C++ con un formato legible y colores inspirados en Dracula.
+Biblioteca **header-only** para imprimir contenedores STL de C++17 con formato
+legible y colores ANSI. No requiere dependencias externas.
 
-## Instalación recomendada: vcpkg
+## Requisitos
 
-La forma recomendada de instalar y actualizar `cpp-printer` es mediante **vcpkg**.
-
-Este proyecto mantiene un port de `cpp-printer` en el fork de vcpkg de BlueNovaStudio:
-
-- https://github.com/BlueNovaStudio/vcpkg
-- https://github.com/BlueNovaStudio/cpp-printer
-
-### 1. Instalar vcpkg
-
-Si todavía no tienes el fork de vcpkg:
-
-```bash
-git clone https://github.com/BlueNovaStudio/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-```
-
-Si ya lo tienes instalado, actualízalo:
-
-```bash
-cd /ruta/a/vcpkg
-git pull
-```
-
-### 2. Instalar cpp-printer
-
-```bash
-./vcpkg install cpp-printer
-```
-
-En Linux x64 puedes especificar el triplet:
-
-```bash
-./vcpkg install cpp-printer:x64-linux
-```
-
-Una vez instalado, puedes incluir la biblioteca directamente:
-
-```cpp
-#include <cpp_printer/print.hpp>
-```
-
-### 3. Actualizar cpp-printer
-
-Cuando se publique una nueva versión en el port de vcpkg, actualiza primero tu checkout de vcpkg:
-
-```bash
-cd /ruta/a/vcpkg
-git pull
-./vcpkg install cpp-printer
-```
-
-No necesitas descargar manualmente los headers ni ejecutar `install.sh` para actualizar una instalación administrada por vcpkg.
+- Compilador C++17 o superior.
+- CMake 3.20 o superior para el build del proyecto.
+- Una terminal compatible con UTF-8 y colores ANSI para ver la salida completa.
 
 ## Uso rápido
 
+Incluye el agregador completo:
+
 ```cpp
-#include <cpp_printer/print.hpp>
+#include "all.hpp"
 #include <vector>
 
 int main()
 {
-    std::vector<int> values = {1, 2, 3};
+    std::vector<int> values{1, 2, 3};
     cpp_printer::cout_vector("values", values);
-    return 0;
 }
 ```
 
-La salida será similar a:
-
-```text
-values = {1, 2, 3}
-```
-
-Declarar un contenedor no lo imprime automáticamente; debes llamar a una de las funciones de `cpp_printer`.
-
-## Integración con CMake
-
-El proyecto exporta el target CMake `cpp_printer::cpp_printer`.
-
-Si tu proyecto utiliza vcpkg en modo manifest, crea un `vcpkg.json` en la raíz del proyecto consumidor:
-
-```json
-{
-  "name": "mi-proyecto",
-  "version-string": "0.1.0",
-  "dependencies": [
-    "cpp-printer"
-  ]
-}
-```
-
-Configura CMake usando el toolchain de vcpkg:
+Compila el ejemplo incluido desde la raíz del repositorio:
 
 ```bash
-cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/ruta/a/vcpkg/scripts/buildsystems/vcpkg.cmake
+g++ -std=c++17 -Iinclude examples/test_cpp_printer/main.cpp -o /tmp/cpp_printer_example
+/tmp/cpp_printer_example
 ```
 
-Y en `CMakeLists.txt`:
-
-```cmake
-find_package(cpp_printer CONFIG REQUIRED)
-
-target_link_libraries(mi_programa PRIVATE cpp_printer::cpp_printer)
-```
-
-Después compila normalmente:
+Si tu archivo está en otra carpeta, usa la misma opción `-Iinclude`:
 
 ```bash
+g++ -std=c++17 -Iinclude examples/test_cpp_printer/main.cpp -o /tmp/cpp_printer_example
+/tmp/cpp_printer_example
+```
+
+También puedes incluir solo el módulo necesario, por ejemplo:
+
+```cpp
+#include "cpp_printer/sequential/vector.hpp"
+```
+
+Las funciones de `tools` y `views` también pertenecen al namespace
+`cpp_printer`:
+
+```cpp
+#include "tools/compare.hpp"
+#include "tools/search.hpp"
+#include "tools/stats.hpp"
+#include "views/ascii.hpp"
+#include "views/table.hpp"
+#include "views/tree.hpp"
+```
+
+Ejemplos disponibles:
+
+- `examples/test_cpp_printer/main.cpp`
+- `examples/test_tools/main.cpp`
+- `examples/test_views/main.cpp`
+
+## Funciones
+
+La API incluye:
+
+- Secuenciales: `cout_array`, `cout_vector`, `cout_list` y `cout_deque`.
+- Sets: `cout_set`, `cout_multiset` y `cout_unordered_set`.
+- Maps: `cout_map`, `cout_multimap` y `cout_unordered_map`.
+- Adaptadores: `cout_queue`, `cout_stack`, `cout_priority_queue` y `cout_pair`.
+- Herramientas: `cout_stats`, `cout_search` y `cout_compare`.
+- Vistas: `cout_ascii`, `cout_table` y `cout_tree`.
+
+Todas se llaman como `cpp_printer::nombre(...)` y escriben en `std::cout`.
+
+## Compilar solo un archivo
+
+El proyecto contiene varios targets de CMake, pero CMake no compila archivos de
+ejemplo automáticamente. Para compilar un archivo concreto:
+
+```bash
+g++ -std=c++17 -Iinclude ruta/al/main.cpp -o app
+./app
+```
+
+En VS Code, abre el archivo `.cpp` que quieras ejecutar y usa la tarea
+**Build current C++ file** (`Ctrl+Shift+B`). La tarea está en
+`.vscode/tasks.json` y compila únicamente `${file}`.
+
+## CMake, CLI y tests
+
+Configura y compila el proyecto completo:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON
 cmake --build build
 ```
 
-Consulta el tutorial completo de vcpkg en [`docs/VCPKG.md`](docs/VCPKG.md).
+Ejecuta los tests:
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+Compila solo la CLI:
+
+```bash
+cmake --build build --target cpp_printer
+./build/cpp_printer
+./build/cpp_printer helpme
+```
+
+La CLI `helpme` copia `docs/CPP_PRINTER.md` al directorio actual.
 
 ## Instalación manual
 
-vcpkg es el método recomendado, pero la instalación manual sigue disponible para usuarios que no utilicen vcpkg.
-
-### Linux / WSL
-
-Para instalar los headers en `/usr/local/include`:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
-```
-
-Después:
-
-```bash
-g++ -std=c++17 main.cpp -o main
-./main
-```
-
-También puedes instalar para tu usuario:
+En Linux o WSL, instalación para el usuario actual:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
+g++ -std=c++17 -I"$HOME/.local/include" main.cpp -o main
 ```
 
-### Windows / MSYS2 UCRT64
+Para instalar en `/usr/local/include` se requieren permisos administrativos:
 
-Desde PowerShell:
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+g++ -std=c++17 main.cpp -o main
+```
+
+En Windows con MSYS2 UCRT64, ejecuta el instalador desde PowerShell y compila
+desde la terminal MSYS2:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
 irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
 ```
 
-Después abre **MSYS2 UCRT64** y compila:
-
 ```bash
 g++ -std=c++17 main.cpp -o main.exe
 ./main.exe
 ```
 
-Si utilizas una instalación manual en otra carpeta, indica la ruta de los headers mediante `-I`.
+## vcpkg
 
-## Requisitos
+El port de vcpkg se mantiene en el fork de BlueNovaStudio:
 
-- C++17 o superior.
-- CMake 3.20 o superior para usar la configuración CMake.
+- https://github.com/BlueNovaStudio/vcpkg
+- https://github.com/BlueNovaStudio/cpp-printer
 
-## Funciones
+Consulta [docs/VCPKG.md](docs/VCPKG.md) para la integración con CMake.
 
-La biblioteca incluye impresores para:
+## Documentación
 
-- Secuenciales: `array`, `vector`, `forward_list` y `deque`.
-- Sets: `set`, `multiset` y `unordered_set`.
-- Maps: `map`, `multimap` y `unordered_map`.
-- Adaptadores: `queue`, `stack`, `priority_queue` y `pair`.
-
-Todas las funciones pertenecen al namespace `cpp_printer` y escriben en `std::cout`.
-
-## CLI
-
-El ejecutable muestra un mensaje inicial sin argumentos y permite copiar la documentación al directorio actual:
-
-```bash
-cpp_printer helpme
-```
-
-Si estás dentro del árbol del proyecto y has compilado con CMake:
-
-```bash
-./build/cpp_printer
-./build/cpp_printer helpme
-```
-
-## Desarrollo
-
-Para configurar y compilar el proyecto:
-
-```bash
-cmake -S . -B build -DBUILD_TESTING=OFF
-cmake --build build --target cpp_printer
-```
-
-## Nota
-
-Estas funciones son atajos para ahorrar tiempo. No sustituyen el aprendizaje de la STL ni la comprensión de las estructuras de datos.
-
-**Automatiza la tarea, no el conocimiento.**
+La guía detallada está en [docs/CPP_PRINTER.md](docs/CPP_PRINTER.md). El
+proyecto se distribuye bajo la licencia incluida en [LICENSE](LICENSE).

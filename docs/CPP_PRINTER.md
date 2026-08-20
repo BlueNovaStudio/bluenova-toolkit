@@ -1,156 +1,87 @@
-# cpp_printer
+# Guía de cpp_printer
 
-`cpp_printer` es una biblioteca de headers para imprimir de forma rápida y legible
-contenedores habituales de la STL de C++.
+## Modelo de inclusión
 
-Las funciones escriben directamente en `std::cout`, muestran el nombre que se les
-proporciona y aplican colores ANSI inspirados en el tema Dracula.
-
-## Requisitos
-
-- Compilador compatible con C++17 o superior.
-- CMake 3.20 o superior para usar la configuración incluida.
-- Una terminal compatible con colores ANSI truecolor para ver la paleta completa.
-
-La biblioteca no necesita dependencias externas: solo utiliza la biblioteca estándar
-de C++.
-
-## Instalación y compilación
-
-### Actualizar una instalación existente
-
-Para actualizar una instalación en WSL o Linux, ejecuta nuevamente el instalador.
-Si se instaló en `/usr/local/include`, usa:
+`cpp_printer` es una biblioteca header-only. Desde un proyecto consumidor,
+añade el directorio `include` del proyecto a la línea de compilación:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+c++ -std=c++17 -I/ruta/a/cpp-printer/include main.cpp -o app
 ```
 
-Para una instalación en `~/.local`:
+Puedes incluir todos los módulos con:
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
+```cpp
+#include "all.hpp"
 ```
 
-Si es necesario eliminar la versión anterior:
+O incluir un header concreto:
 
-```bash
-sudo rm -rf /usr/local/include/cpp_printer
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
+```cpp
+#include "cpp_printer/sequential/vector.hpp"
 ```
 
-Luego recompila el archivo del usuario:
+Los headers públicos usan el namespace `cpp_printer`, incluidos los módulos de
+`tools` y `views`.
 
-```bash
-g++ -std=c++17 main.cpp -o main
-./main
-```
+## Impresores STL
 
-En Windows nativo, descarga de nuevo el ZIP y reemplaza la carpeta
-`C:\cpp-libs\cpp_printer\include\cpp_printer`, después ejecuta otra vez la
-tarea **Build main.cpp** de VS Code.
+```cpp
+#include "all.hpp"
+#include <map>
+#include <string>
+#include <vector>
 
-### Windows nativo
-
-Con Windows nativo y MSYS2/UCRT64, abre **PowerShell** e instala los headers en
-la carpeta del compilador:
-
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
-```
-
-Después abre **MSYS2 UCRT64**, no WSL, y ejecuta:
-
-```bash
-cd /c/Users/paulo/OneDrive/Desktop/pruebaLIB
-g++ -std=c++17 main.cpp -o main.exe
-./main.exe
-```
-
-Por defecto el instalador copia los headers a:
-
-```text
-C:\msys64\ucrt64\include\cpp_printer
-```
-
-Si tu MinGW está en otra ubicación, usa el parámetro `-Prefix` del script.
-
-En Windows nativo, descarga el repositorio como ZIP y copia la carpeta `include`
-en una ubicación estable, por ejemplo:
-
-```text
-C:\cpp-libs\cpp_printer\include\cpp_printer\print.hpp
-```
-
-El proyecto del usuario puede estar en cualquier otra carpeta. Con MinGW/MSYS2:
-
-```bash
-g++ -std=c++17 main.cpp -I C:/cpp-libs/cpp_printer/include -o main.exe
-./main.exe
-```
-
-En VS Code, abre la carpeta que contiene `main.cpp`. Para que IntelliSense y el
-botón de ejecución conozcan la biblioteca, añade esta ruta a
-`.vscode/c_cpp_properties.json`:
-
-```json
+int main()
 {
-	"version": 4,
-	"configurations": [
-		{
-			"name": "Windows",
-			"compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
-			"intelliSenseMode": "windows-gcc-x64",
-			"cppStandard": "c++17",
-			"includePath": [
-				"${workspaceFolder}/**",
-				"C:/cpp-libs/cpp_printer/include"
-			]
-		}
-	]
+    std::vector<int> values{1, 2, 3};
+    std::map<std::string, int> scores{{"total", 42}};
+
+    cpp_printer::cout_vector("values", values);
+    cpp_printer::cout_map("scores", scores);
 }
 ```
 
-`cpp_printer` no busca carpetas por sí misma; la ruta la configura el compilador.
-En WSL, abre el proyecto con **WSL: Reopen Folder in WSL** y usa la ruta Linux
-correspondiente, como `/usr/local/include` o `/mnt/c/...`.
+Están disponibles `array`, `vector`, `list`, `deque`, `set`, `multiset`,
+`unordered_set`, `map`, `multimap`, `unordered_map`, `queue`, `stack`,
+`priority_queue` y `pair`.
 
-Para compilar un archivo suelto desde VS Code en Windows, crea
-`.vscode/tasks.json` con una tarea que incluya:
+## Herramientas
 
-```json
-{
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "Build main.cpp",
-			"type": "shell",
-			"command": "C:/msys64/ucrt64/bin/g++.exe",
-			"args": [
-				"-std=c++17",
-				"${file}",
-				"-I",
-				"C:/cpp-libs/cpp_printer/include",
-				"-o",
-				"${fileDirname}/${fileBasenameNoExtension}.exe"
-			],
-			"problemMatcher": ["$gcc"]
-		}
-	]
-}
+```cpp
+#include "tools/compare.hpp"
+#include "tools/search.hpp"
+#include "tools/stats.hpp"
+
+cpp_printer::cout_compare("left", left, "right", right);
+cpp_printer::cout_search("values", values, 2);
+cpp_printer::cout_stats("values", values);
 ```
 
-Después usa `Ctrl+Shift+B` y selecciona `Build main.cpp`.
+`cout_compare` muestra las diferencias elemento a elemento y acepta dos
+contenedores iterables. `cout_search` resalta las coincidencias y sus índices.
+`cout_stats` muestra tamaño, suma, promedio, mínimo y máximo para elementos
+aritméticos.
 
-Incluye el directorio `include` en tu proyecto. Con CMake:
+## Vistas
 
-```bash
-cmake -S . -B build -DBUILD_TESTING=OFF
-cmake --build build
+```cpp
+#include "views/ascii.hpp"
+#include "views/table.hpp"
+#include "views/tree.hpp"
+
+cpp_printer::cout_ascii("values", values);
+cpp_printer::cout_table("matrix", matrix);
+cpp_printer::cout_tree("tree", values);
 ```
 
-Para compilar los tests:
+`cout_table` recibe una estructura bidimensional, como
+`std::vector<std::vector<int>>`. `cout_ascii` recibe un `std::vector<int>` y
+`cout_tree` recibe un contenedor iterable.
+
+## Compilación del repositorio
+
+Para compilar el CLI y los tests:
 
 ```bash
 cmake -S . -B build -DBUILD_TESTING=ON
@@ -158,372 +89,26 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-### Instalación rápida desde GitHub
-
-En Linux o macOS puedes instalar los headers sin un gestor de paquetes:
+Para compilar solo el CLI:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | bash
+cmake --build build --target cpp_printer
+./build/cpp_printer
+./build/cpp_printer helpme
 ```
 
-Por defecto se instala en `~/.local`. Compila incluyendo sus headers con:
+Para compilar un ejemplo aislado no uses el build completo:
 
 ```bash
-c++ -std=c++17 -I"$HOME/.local/include" main.cpp -o app
+c++ -std=c++17 -Iinclude examples/test_tools/main.cpp -o /tmp/tools_example
+/tmp/tools_example
 ```
 
-Esta instalación es global para tu usuario. C++ no utiliza un entorno virtual
-equivalente a `.venv`. Para aislar la biblioteca en un proyecto concreto:
+La tarea **Build current C++ file** de VS Code compila el archivo `.cpp`
+activo usando `-I${workspaceFolder}/include`.
 
-```bash
-mkdir -p .deps
-CPP_PRINTER_PREFIX="$PWD/.deps" bash <(curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh)
-c++ -std=c++17 -I"$PWD/.deps/include" main.cpp -o app
-```
+## Colores y terminales
 
-Si quieres usarla como un header del sistema y compilar sin `-I`, instala con
-permisos administrativos:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
-```
-
-Esto instala los headers en `/usr/local/include/cpp_printer`. Después puedes
-compilar directamente:
-
-```bash
-g++ -std=c++17 main.cpp -o app
-```
-
-## Uso básico
-
-### Tutorial humano: de cero a la primera impresión
-
-Antes de instalar, decide dónde vas a compilar. WSL/Linux, PowerShell y MSYS2
-son entornos diferentes y no comparten automáticamente sus rutas de headers.
-Un prompt `bluenova@Studio` indica WSL; un prompt `PS C:\` indica PowerShell.
-
-En WSL/Linux:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.sh | sudo bash
-mkdir -p ~/cpp-printer-example
-cd ~/cpp-printer-example
-```
-
-En Windows nativo con MSYS2/UCRT64, instala desde PowerShell:
-
-```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/install.ps1 | iex
-```
-
-Luego abre MSYS2 UCRT64 y trabaja desde allí. La biblioteca queda en
-`C:\msys64\ucrt64\include\cpp_printer`.
-
-Crea `main.cpp` con una llamada real al impresor:
-
-```cpp
-#include <cpp_printer/print.hpp>
-#include <vector>
-
-int main()
-{
-	std::vector<int> values = {1, 2, 3};
-	cpp_printer::cout_vector("values", values);
-}
-```
-
-En WSL compila con:
-
-```bash
-g++ -std=c++17 main.cpp -o main
-./main
-```
-
-En MSYS2 UCRT64 compila con:
-
-```bash
-g++ -std=c++17 main.cpp -o main.exe
-./main.exe
-```
-
-Si el programa compila pero no imprime nada, normalmente falta la llamada
-`cpp_printer::cout_vector(...)`; declarar un vector por sí solo no produce
-salida. Si falta el header, comprueba que `g++` y la terminal pertenecen al
-mismo entorno.
-
-La forma más sencilla de incluir todas las funciones es:
-
-```cpp
-#include "cpp_printer/print.hpp"
-```
-
-También puedes incluir un header concreto, por ejemplo:
-
-```cpp
-#include "cpp_printer/secuential/vector.hpp"
-```
-
-Ejemplo:
-
-```cpp
-#include "cpp_printer/print.hpp"
-#include <vector>
-
-int main()
-{
-		std::vector<int> values = {1, 2, 3};
-		cpp_printer::cout_vector("values", values);
-}
-```
-
-Salida visible:
-
-```text
-values = {1, 2, 3}
-```
-
-Los colores no aparecen en el bloque de texto anterior porque se representan en la
-salida como códigos ANSI.
-
-## Formato y colores
-
-La salida utiliza esta convención:
-
-| Elemento | Color Dracula | Código hex |
-| --- | --- | --- |
-| Números y booleanos | Purple | `#BD93F9` |
-| Strings y `char` | Green | `#50FA7B` |
-| Nombres de variables | Foreground | `#F8F8F2` |
-| Símbolos, separadores y delimitadores | Foreground | `#F8F8F2` |
-| Palabras clave reservadas | Pink | `#FF79C6` |
-| Funciones y métodos | Cyan | `#8BE9FD` |
-| Comentarios | Comment | `#6272A4` |
-| Fondo de referencia | Background | `#282A36` |
-
-La biblioteca imprime los strings con comillas dobles y los caracteres con comillas
-simples:
-
-```text
-words = {"hello", "world"}
-letters = {'a', 'b'}
-```
-
-## Funciones disponibles
-
-Todas las funciones están en el namespace `cpp_printer` y siguen esta estructura:
-
-```cpp
-cpp_printer::funcion("nombre", contenedor);
-```
-
-El primer argumento es el nombre que aparecerá en la salida. El segundo argumento
-debe ser una estructura compatible con la firma de la función.
-
-### Contenedores secuenciales
-
-#### `cout_array`
-
-```cpp
-template <typename T>
-void cout_array(const std::string& name_array, const T* arr, std::size_t size);
-```
-
-Imprime un array tradicional mediante un puntero y su cantidad de elementos.
-
-- `name_array`: nombre mostrado.
-- `arr`: puntero al primer elemento.
-- `size`: número de elementos válidos.
-- Requisito: `arr` debe apuntar a una región válida de al menos `size` elementos.
-
-```cpp
-int values[] = {10, 20, 30};
-cpp_printer::cout_array("values", values, 3);
-```
-
-#### `cout_vector`
-
-```cpp
-template <typename T>
-void cout_vector(const std::string& name_vector,
-								const std::vector<T>& container);
-```
-
-Requiere un `std::vector<T>`. Los elementos deben poder escribirse en un stream,
-o ser tipos reconocidos por el formateador, como números, `bool`, `std::string` o
-`char`.
-
-#### `cout_list`
-
-```cpp
-template <typename T>
-void cout_list(const std::string& name_list,
-							const std::forward_list<T>& container);
-```
-
-Requiere un `std::forward_list<T>` cuyos elementos puedan imprimirse.
-
-#### `cout_deque`
-
-```cpp
-template <typename T>
-void cout_deque(const std::string& name_deque,
-							 const std::deque<T>& container);
-```
-
-Requiere un `std::deque<T>` cuyos elementos puedan imprimirse.
-
-### Sets
-
-#### `cout_set`
-
-```cpp
-template <typename T>
-void cout_set(const std::string& name_set, const std::set<T>& container);
-```
-
-Imprime un `std::set<T>` en el orden definido por el contenedor.
-
-#### `cout_multiset`
-
-```cpp
-template <typename T>
-void cout_multiset(const std::string& name_multiset,
-									const std::multiset<T> container);
-```
-
-Imprime un `std::multiset<T>`, incluyendo los valores repetidos y respetando su
-orden ordenado.
-
-#### `cout_unordered_set`
-
-```cpp
-template <typename T>
-void cout_unordered_set(const std::string& name_unordered_set,
-											 std::unordered_set<T> container);
-```
-
-Imprime un `std::unordered_set<T>`. El orden no está garantizado y puede cambiar.
-
-### Maps
-
-Los mapas se imprimen con el formato `clave: valor`.
-
-#### `cout_map`
-
-```cpp
-template <typename Key, typename T>
-void cout_map(const std::string& name_map,
-						 const std::map<Key, T>& container);
-```
-
-Requiere un `std::map<Key, T>`. La clave y el valor deben poder imprimirse.
-
-#### `cout_multimap`
-
-```cpp
-template <typename Key, typename T>
-void cout_multimap(const std::string& name_multimap,
-									const std::multimap<Key, T>& container);
-```
-
-Requiere un `std::multimap<Key, T>`. Puede contener varias entradas con la misma
-clave.
-
-#### `cout_unordered_map`
-
-```cpp
-template <typename Key, typename T>
-void cout_unordered_map(const std::string& name_unordered_map,
-												const std::unordered_map<Key, T>& container);
-```
-
-Requiere un `std::unordered_map<Key, T>`. El orden de impresión no está garantizado.
-
-### Adaptadores de contenedores
-
-#### `cout_queue`
-
-```cpp
-template <typename T, typename Container>
-void cout_queue(const std::string& name_queue,
-								std::queue<T, Container> container);
-```
-
-Imprime la cola desde el primer elemento insertado hasta el último. Se pasa por
-valor para poder usar `front()` y `pop()` sobre una copia; la cola original no cambia.
-
-#### `cout_stack`
-
-```cpp
-template <typename T, typename Container>
-void cout_stack(const std::string& name_stack,
-								std::stack<T, Container> container);
-```
-
-Imprime desde el elemento superior hacia abajo usando `top()` y `pop()`. La pila
-original no cambia porque la función trabaja con una copia.
-
-#### `cout_priority_queue`
-
-```cpp
-template <typename T,
-					typename Container = std::vector<T>,
-					typename Compare = std::less<T>>
-void cout_priority_queue(
-		const std::string& name_priority_queue,
-		std::priority_queue<T, Container, Compare> container);
-```
-
-Imprime los elementos en el orden de prioridad, comenzando por el elemento que
-`top()` considera prioritario. La cola original no cambia.
-
-#### `cout_pair`
-
-```cpp
-template <typename Key, typename T>
-void cout_pair(const std::string& name_pair,
-							 const std::pair<Key, T>& container);
-```
-
-Imprime una pareja con el formato `clave: valor`. Tanto `Key` como `T` deben poder
-imprimirse.
-
-```cpp
-std::pair<std::string, char> status = {"state", 'A'};
-cpp_printer::cout_pair("status", status);
-```
-
-## Tipos compatibles
-
-El formateador reconoce automáticamente:
-
-- Tipos numéricos y `bool`.
-- `std::string` y cadenas literales, con comillas dobles.
-- `char`, con comillas simples.
-- Otros tipos que implementen `operator<<` para `std::ostream`.
-
-Si un tipo personalizado no tiene `operator<<`, debes definirlo antes de usarlo con
-una función de `cpp_printer`.
-
-## Limitaciones
-
-- La biblioteca imprime en `std::cout`; no devuelve strings.
-- Los colores requieren una terminal ANSI truecolor.
-- Los contenedores unordered no tienen un orden de impresión estable.
-- `cout_array` no valida el tamaño ni el puntero; esa responsabilidad pertenece al
-	código que realiza la llamada.
-
-## Importante
-
-Estas funciones son atajos diseñados para ahorrar tiempo.
-
-No sustituyen el aprendizaje de la STL ni la comprensión de las estructuras de
-datos.
-
-Aprende primero cómo funcionan las estructuras.
-
-Después utiliza estas herramientas para trabajar más rápido.
-
-**Automatiza la tarea, no el conocimiento.**
+La salida usa secuencias ANSI truecolor. La comparación de tests elimina esas
+secuencias antes de verificar el texto, por lo que los tests también funcionan
+en terminales sin soporte de color.
