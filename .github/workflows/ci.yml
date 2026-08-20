@@ -1,29 +1,64 @@
-name: Build and test
+name: CI
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
-    name: Build (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+  linux:
+    name: Linux (${{ matrix.compiler }})
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
+        compiler: [gcc, clang]
+
+    env:
+      CC: ${{ matrix.compiler == 'gcc' && 'gcc' || 'clang' }}
+      CXX: ${{ matrix.compiler == 'gcc' && 'g++' || 'clang++' }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Configure
-        run: cmake -S . -B build -DBUILD_TESTING=ON
+        run: >-
+          cmake -S . -B build
+          -DCPP_PRINTER_BUILD_TESTS=ON
+          -DCPP_PRINTER_BUILD_EXAMPLES=ON
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run examples
+        run: cmake --build build --target run_examples
+
+  windows:
+    name: Windows (MSVC)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build -A x64
+          -DCPP_PRINTER_BUILD_TESTS=ON
+          -DCPP_PRINTER_BUILD_EXAMPLES=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
 
       - name: Test
         run: ctest --test-dir build --build-config Release --output-on-failure
+
+      - name: Run examples
+        run: cmake --build build --target run_examples --config Release

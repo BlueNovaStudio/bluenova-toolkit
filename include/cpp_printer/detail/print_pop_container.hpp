@@ -6,15 +6,15 @@
 namespace cpp_printer::detail
 {
     template <typename Container, typename GetElement>
-    void print_pop_container(Container container, GetElement get_element)
+    void print_pop_container(std::ostream& output, Container container, GetElement get_element)
     {
         bool first = true;
         while (!container.empty())
         {
             if (!first)
-                print_syntax(std::cout, ", ");
+                print_syntax(output, ", ");
 
-            print_value(std::cout, get_element(container));
+            print_value(output, get_element(container));
             container.pop();
             first = false;
         }

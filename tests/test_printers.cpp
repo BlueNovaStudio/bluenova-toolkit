@@ -169,7 +169,7 @@ int main()
 
     assert_prints(capture_output([&] {
         cpp_printer::cout_compare("left", vector_values, "right", vector_values);
-    }), "left vs right:\n  Las estructuras son idénticas.\n");
+    }), "left vs right:\n  Las estructuras son idénticas (mismo tamaño y elementos en misma posición).\n");
 
     // ==========================================
     // 4. PRUEBAS DE MÓDULO: VIEWS
@@ -178,7 +178,11 @@ int main()
     std::vector<std::vector<int>> table_data{{1, 42}};
     assert_prints(capture_output([&] {
         cpp_printer::cout_ascii("ascii", bar_data);
-    }), "ascii:\n5 ████████\n3 █████\n8 ████████████\n2 ███\n");
+    }), "ascii:\n  (min=2, max=8)\n"
+        "5 ███████████████████\n"
+        "3 ███████████\n"
+        "8 ██████████████████████████████\n"
+        "2 ████████\n");
 
     assert_prints(capture_output([&] {
         cpp_printer::cout_table("table", table_data);

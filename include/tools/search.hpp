@@ -55,9 +55,11 @@ namespace cpp_printer
             for (std::size_t i = 0; i < match_indices.size(); ++i)
             {
                 if (i > 0) detail::print_syntax(std::cout, ", ");
-                detail::print_value(std::cout, match_indices[i]);
+                // Keep the closing bracket adjacent to the final index in the
+                // plain stream as well as in coloured terminal output.
+                std::cout << match_indices[i];
             }
-            detail::print_syntax(std::cout, "]\n");
+            std::cout << "]\n";
         }
     }
 

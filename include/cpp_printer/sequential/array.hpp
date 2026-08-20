@@ -13,7 +13,7 @@ namespace cpp_printer
     {
         detail::print_name(std::cout, name_array);
         detail::print_syntax(std::cout, " = {");
-        detail::print_range(arr, arr + size,
+        detail::print_range(std::cout, arr, arr + size,
             [](auto& output, const auto& element) { detail::print_value(output, element); });
         detail::print_syntax(std::cout, "}\n");
     }

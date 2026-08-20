@@ -97,7 +97,7 @@ cmake --build build
 En el código C++ puedes incluir la biblioteca normalmente:
 
 ```cpp
-#include <cpp_printer/print.hpp>
+#include <all.hpp>
 ```
 
 El paquete exporta el target CMake:
@@ -147,7 +147,8 @@ El comando:
 
 funciona con el árbol de ports que contiene el port `cpp-printer` de BlueNovaStudio.
 
-Este fork ya contiene `cpp-printer` 1.0.2 y su baseline correspondiente.
+Para publicar esta entrega, actualiza el port y su baseline a `cpp-printer`
+**1.0.4**. La versión anterior publicada por el proyecto fue **1.0.3**.
 
 Si utilizas otra instalación de vcpkg que no tenga este port, el comando puede indicar que no existe el paquete. En ese caso, utiliza este fork o un registro de vcpkg que contenga el port.
 

@@ -3,9 +3,19 @@
 #include <iostream>
 #include <string>
 #include <type_traits>
+#include <variant>
 
 namespace cpp_printer::detail
 {
+    template <typename T>
+    struct is_variant : std::false_type {};
+
+    template <typename... Types>
+    struct is_variant<std::variant<Types...>> : std::true_type {};
+
+    template <typename T>
+    inline constexpr bool is_variant_v = is_variant<std::remove_cv_t<std::remove_reference_t<T>>>::value;
+
     namespace color
     {
         inline constexpr const char* reset = "\033[0m";
@@ -20,6 +30,8 @@ namespace cpp_printer::detail
         inline constexpr const char* comment = "\033[38;2;98;114;164m";
         inline constexpr const char* error = "\033[38;2;255;85;85m";
         inline constexpr const char* success = "\033[38;2;80;250;123m";
+        inline constexpr const char* info = "\033[38;2;139;233;253m";
+        inline constexpr const char* warning = "\033[38;2;241;250;140m";
         inline constexpr const char* background = "\033[48;2;40;42;54m";
         inline constexpr const char* yellow = "\033[38;2;241;250;140m";
     }
@@ -61,6 +73,10 @@ namespace cpp_printer::detail
         else if constexpr (std::is_arithmetic_v<Value>)
         {
             output << color::number << value << color::reset;
+        }
+        else if constexpr (is_variant_v<Value>)
+        {
+            std::visit([&output](const auto& item) { print_value(output, item); }, value);
         }
         else
         {

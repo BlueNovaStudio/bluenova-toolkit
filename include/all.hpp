@@ -25,6 +25,7 @@
 
 // tools
 #include "tools/compare.hpp"
+#include "tools/diff.hpp"
 #include "tools/search.hpp"
 #include "tools/stats.hpp"
 

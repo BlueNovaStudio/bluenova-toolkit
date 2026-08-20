@@ -20,7 +20,7 @@ namespace cpp_printer
 	{
 		detail::print_name(std::cout, name_priority_queue);
 		detail::print_syntax(std::cout, " = {");
-		detail::print_pop_container(container, [](const auto& current) {
+		detail::print_pop_container(std::cout, container, [](const auto& current) {
 			return current.top();
 		});
 		detail::print_syntax(std::cout, "}\n");

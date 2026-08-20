@@ -7,11 +7,8 @@
 #include <cstring>
 #include <algorithm>
 #include <type_traits>
+#include <iomanip>
 #include "cpp_printer/detail/print_format.hpp"
-
-
-// Nota: Asegúrate de incluir los helpers de formato/colores de tu proyecto
-// #include "../detail/print_format.hpp"
 
 namespace cpp_printer::detail {
 
@@ -23,15 +20,47 @@ namespace cpp_printer::detail {
         if constexpr (std::is_same_v<Value, std::string>) {
             return value.length() + 2; // Incluye las comillas " " de la representación
         } else if constexpr (std::is_same_v<Value, const char*> || std::is_same_v<Value, char*>) {
-            return (value ? std::strlen(value) : 0) + 2;
+            return (value ? std::strlen(value) : 4) + 2; // "null" es el caso especial
         } else if constexpr (std::is_array_v<Value> && std::is_same_v<std::remove_extent_t<Value>, char>) {
             return std::strlen(value) + 2;
         } else if constexpr (std::is_same_v<Value, char>) {
             return 3; // Incluye comillas simples ' '
+        } else if constexpr (std::is_same_v<Value, bool>) {
+            return value ? 4 : 5; // "true" o "false"
+        } else if constexpr (std::is_floating_point_v<Value>) {
+            std::ostringstream ss;
+            ss << std::fixed << std::setprecision(2) << value;
+            return ss.str().length();
         } else {
             std::ostringstream ss;
             ss << value;
             return ss.str().length();
+        }
+    }
+
+    // Helper para imprimir valores con formato consistente
+    template <typename T>
+    void print_value_formatted(std::ostream& output, const T& value) {
+        using Value = std::remove_cv_t<std::remove_reference_t<T>>;
+
+        if constexpr (std::is_same_v<Value, std::string>) {
+            output << "\"" << value << "\"";
+        } else if constexpr (std::is_same_v<Value, const char*> || std::is_same_v<Value, char*>) {
+            if (value) {
+                output << "\"" << value << "\"";
+            } else {
+                output << "null";
+            }
+        } else if constexpr (std::is_array_v<Value> && std::is_same_v<std::remove_extent_t<Value>, char>) {
+            output << "\"" << value << "\"";
+        } else if constexpr (std::is_same_v<Value, char>) {
+            output << "'" << value << "'";
+        } else if constexpr (std::is_same_v<Value, bool>) {
+            output << (value ? "true" : "false");
+        } else if constexpr (std::is_floating_point_v<Value>) {
+            output << std::fixed << std::setprecision(2) << value;
+        } else {
+            output << value;
         }
     }
 }
@@ -47,32 +76,38 @@ namespace cpp_printer {
      */
     template <typename Matrix>
     void print_table(std::ostream& output, const std::string& name_structure, const Matrix& matrix) {
+        // Verificar si la matriz está vacía (compatible con C++17)
         if (std::empty(matrix)) {
             detail::print_name(output, name_structure);
             detail::print_syntax(output, " [tabla vacía]\n");
             return;
         }
 
-        // 1. Calcular el número total de columnas y el ancho máximo de cada una
+        // Calcular columnas y detectar filas con datos en una sola pasada.
         std::vector<std::size_t> col_widths;
+        std::size_t max_columns = 0;
+        for (const auto& row : matrix) {
+            std::size_t row_size = std::distance(std::begin(row), std::end(row));
+            max_columns = std::max(max_columns, row_size);
+        }
 
+        if (max_columns == 0) {
+            detail::print_name(output, name_structure);
+            detail::print_syntax(output, " [tabla con filas vacías]\n");
+            return;
+        }
+
+        // Inicializar widths con max_columns
+        col_widths.resize(max_columns, 0);
+
+        // Segundo pase: calcular anchos máximos
         for (const auto& row : matrix) {
             std::size_t col_idx = 0;
             for (const auto& cell : row) {
                 std::size_t cell_len = detail::get_visible_length(cell);
-                if (col_idx >= col_widths.size()) {
-                    col_widths.push_back(cell_len);
-                } else {
-                    col_widths[col_idx] = std::max(col_widths[col_idx], cell_len);
-                }
+                col_widths[col_idx] = std::max(col_widths[col_idx], cell_len);
                 col_idx++;
             }
-        }
-
-        if (col_widths.empty()) {
-            detail::print_name(output, name_structure);
-            detail::print_syntax(output, " [tabla vacía]\n");
-            return;
         }
 
         // Encabezado
@@ -112,7 +147,8 @@ namespace cpp_printer {
                 detail::print_syntax(output, " "); // Padding izquierdo
 
                 if (cell_it != cell_end) {
-                    detail::print_value(output, *cell_it);
+                    // Imprimir el valor con formato
+                    detail::print_value_formatted(output, *cell_it);
                     std::size_t vis_len = detail::get_visible_length(*cell_it);
                     
                     // Relleno de espacios a la derecha según el ancho máximo de la columna
