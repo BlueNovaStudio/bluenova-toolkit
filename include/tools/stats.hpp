@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <algorithm>
 #include <iterator>
 #include <type_traits>
 #include <map>

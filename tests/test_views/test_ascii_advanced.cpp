@@ -4,8 +4,10 @@
 #include <list>
 #include <deque>
 #include <array>
+#include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <limits>
 #include "../include/views/ascii.hpp"
 
 using namespace cpp_printer;
@@ -154,6 +156,22 @@ void test_ascii_zero_values() {
     std::cout << "PASSED\n";
 }
 
+void test_ascii_max_blocks_is_bounded() {
+    std::cout << "Testing ascii max_blocks bound... ";
+    std::vector<int> values = {1000};
+    AsciiChartConfig config;
+    config.max_blocks = 1000;
+    config.normalize = false;
+    config.block_char = "#";
+    auto output = capture_output([&]() { cout_ascii("test", values, config); });
+    assert(std::count(output.begin(), output.end(), '#') ==
+           static_cast<std::string::difference_type>(ascii_max_blocks_limit));
+    assert(safe_block_count(std::numeric_limits<double>::infinity(), 10) == 0);
+    assert(safe_block_count(1.0e300, std::numeric_limits<std::size_t>::max()) ==
+           ascii_max_blocks_limit);
+    std::cout << "PASSED\n";
+}
+
 void run_all_tests() {
     std::cout << "\n=== Running ASCII Advanced Tests ===\n\n";
     test_ascii_basic_vector();
@@ -166,6 +184,7 @@ void run_all_tests() {
     test_ascii_custom_config();
     test_ascii_different_containers();
     test_ascii_zero_values();
+    test_ascii_max_blocks_is_bounded();
     std::cout << "\n✓ All ascii tests passed!\n";
 }
 

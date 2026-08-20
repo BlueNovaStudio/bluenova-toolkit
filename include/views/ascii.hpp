@@ -15,15 +15,21 @@
 
 namespace cpp_printer
 {
+    inline constexpr std::size_t ascii_max_blocks_limit = 200;
+
     inline void print_positive_bar(std::size_t blocks, const std::string& block_char);
     inline void print_negative_bar(std::size_t blocks, const std::string& block_char);
     inline void print_single_bar(std::size_t blocks, const std::string& block_char, bool is_negative);
 
     inline std::size_t safe_block_count(double value, std::size_t limit)
     {
-        if (!std::isfinite(value) || value <= 0.0 || limit == 0) return 0;
-        if (value >= static_cast<double>(limit)) return limit;
-        return static_cast<std::size_t>(std::lround(value));
+        const std::size_t bounded_limit = std::min(limit, ascii_max_blocks_limit);
+        if (!std::isfinite(value) || value <= 0.0 || bounded_limit == 0) return 0;
+        if (value >= static_cast<double>(bounded_limit)) return bounded_limit;
+
+        const long rounded = std::lround(value);
+        if (rounded <= 0) return 0;
+        return std::min(static_cast<std::size_t>(rounded), bounded_limit);
     }
 
     // ============================================================
@@ -113,6 +119,7 @@ namespace cpp_printer
         // Configuración adaptativa
         AsciiChartConfig cfg = config;
         if (cfg.max_blocks == 0) cfg.max_blocks = 30;
+        cfg.max_blocks = std::min(cfg.max_blocks, ascii_max_blocks_limit);
         
         // Para números negativos, necesitamos dos barras (negativa y positiva)
         const bool use_dual_bars = has_negative && cfg.normalize;
