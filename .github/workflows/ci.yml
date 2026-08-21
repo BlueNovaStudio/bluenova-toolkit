@@ -51,6 +51,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Compiler version
         shell: pwsh
         run: cl
