@@ -210,14 +210,56 @@ g++ -std=c++17 main.cpp -o main.exe
 ./main.exe
 ```
 
-## vcpkg
+## Instalación global con vcpkg
 
-El port de vcpkg se mantiene en el fork de BlueNovaStudio:
+No necesitas clonar `cpp-printer`, ni añadir un repositorio Git a cada proyecto
+nuevo. Ejecuta el instalador una vez: deja vcpkg y los paquetes en una ubicación
+estable fuera de tus proyectos; al volver a ejecutarlo, actualiza vcpkg e instala
+la versión publicada más reciente de `cpp-printer`.
 
-- https://github.com/BlueNovaStudio/vcpkg
-- https://github.com/BlueNovaStudio/cpp-printer
+En Linux, la ubicación predeterminada es `~/.local/vcpkg`:
 
-Consulta [docs/VCPKG.md](docs/VCPKG.md) para la integración con CMake.
+```bash
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.sh | bash
+```
+
+En Windows, abre PowerShell y la ubicación predeterminada es `C:\vcpkg`:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.ps1 | iex
+```
+
+Para actualizar, repite el mismo comando. Puedes elegir otra ubicación estable
+con `VCPKG_ROOT=/ruta/vcpkg` en Linux o `-VcpkgRoot D:\vcpkg` al ejecutar el
+script de PowerShell descargado.
+
+En tu proyecto CMake solo referencia el toolchain global; no hace falta un
+`vcpkg.json` ni checkout adicional:
+
+```bash
+cmake -S . -B build \
+  -DCMAKE_TOOLCHAIN_FILE="$HOME/.local/vcpkg/scripts/buildsystems/vcpkg.cmake"
+cmake --build build
+```
+
+En Windows, usa:
+
+```powershell
+cmake -S . -B build -A x64 `
+  -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
+cmake --build build --config Release
+```
+
+Y enlaza el target exportado:
+
+```cmake
+find_package(cpp_printer CONFIG REQUIRED)
+target_link_libraries(mi_programa PRIVATE cpp_printer::cpp_printer)
+```
+
+Consulta [docs/VCPKG.md](docs/VCPKG.md) para alternativas de triplet y
+mantenimiento del port.
 
 ## Documentación
 

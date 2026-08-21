@@ -10,48 +10,48 @@ Repositorio de la biblioteca:
 
 `https://github.com/BlueNovaStudio/cpp-printer`
 
-## 1. Preparar vcpkg
+## 1. Instalación global automática
 
-Clona el fork de vcpkg si todavía no lo tienes:
+No clones `cpp-printer` dentro de un proyecto consumidor. Los scripts del
+repositorio instalan el fork de vcpkg en una ubicación estable, descargan el
+port publicado e instalan `cpp-printer`. Si vcpkg ya existe en esa ubicación,
+lo actualizan con `git pull --ff-only` antes de instalar.
 
-```bash
-git clone https://github.com/BlueNovaStudio/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-```
-
-Si ya tienes el repositorio local, actualízalo antes de instalar o actualizar paquetes:
+En Linux, el directorio predeterminado es `~/.local/vcpkg`:
 
 ```bash
-cd /ruta/a/vcpkg
-git pull
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.sh | bash
 ```
 
-Comprueba la versión:
+En Windows, el directorio predeterminado es `C:\vcpkg`:
 
-```bash
-./vcpkg version
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.ps1 | iex
 ```
+
+Ambas ubicaciones están fuera de los proyectos consumidores. Para actualizar la
+biblioteca más adelante, repite el mismo comando.
 
 ## 2. Instalar cpp-printer
 
-La instalación recomendada es simplemente:
+Después de ejecutar el script, la instalación equivalente es:
 
 ```bash
-./vcpkg install cpp-printer
+~/.local/vcpkg/vcpkg install cpp-printer
 ```
 
 En Linux x64 puedes especificar el triplet explícitamente:
 
 ```bash
-./vcpkg install cpp-printer:x64-linux
+~/.local/vcpkg/vcpkg install cpp-printer:x64-linux
 ```
 
-Si el paquete ya está instalado y el port de vcpkg apunta a una versión nueva, vuelve a ejecutar el comando después de actualizar vcpkg:
+En Windows, el ejecutable instalado globalmente es `C:\vcpkg\vcpkg.exe` y el
+triplet predeterminado es `x64-windows`:
 
-```bash
-git pull
-./vcpkg install cpp-printer
+```powershell
+C:\vcpkg\vcpkg.exe install cpp-printer:x64-windows
 ```
 
 vcpkg resolverá la versión definida por el baseline de tu árbol de ports.
@@ -61,21 +61,27 @@ vcpkg resolverá la versión definida por el baseline de tu árbol de ports.
 Para recibir una nueva versión publicada en este fork:
 
 ```bash
-cd /ruta/a/vcpkg
-git pull
-./vcpkg install cpp-printer
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.sh | bash
 ```
 
-No es necesario descargar manualmente los headers ni ejecutar `install.sh`.
+En Windows, repite el instalador de PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.ps1 | iex
+```
+
+No es necesario descargar manualmente los headers, clonar esta biblioteca ni
+ejecutar `install.sh`.
 
 Si quieres reconstruir explícitamente el paquete desde cero:
 
 ```bash
-./vcpkg remove cpp-printer
-./vcpkg install cpp-printer
+~/.local/vcpkg/vcpkg remove cpp-printer
+~/.local/vcpkg/vcpkg install cpp-printer
 ```
 
-Normalmente no necesitas hacer esto: `git pull` seguido de `vcpkg install` es suficiente cuando el baseline ha cambiado.
+Normalmente no necesitas hacerlo: el instalador actualiza el checkout global y
+ejecuta `vcpkg install` con el baseline actualizado.
 
 ## 4. Usarlo desde CMake
 
@@ -85,7 +91,7 @@ Por ejemplo:
 
 ```bash
 cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/ruta/a/vcpkg/scripts/buildsystems/vcpkg.cmake
+  -DCMAKE_TOOLCHAIN_FILE="$HOME/.local/vcpkg/scripts/buildsystems/vcpkg.cmake"
 ```
 
 Después compila:
@@ -114,35 +120,19 @@ find_package(cpp_printer CONFIG REQUIRED)
 target_link_libraries(mi_programa PRIVATE cpp_printer::cpp_printer)
 ```
 
-## 5. Usarlo con manifest mode
+En Windows, el toolchain global es:
 
-En proyectos nuevos, también puedes crear un `vcpkg.json` en la raíz del proyecto consumidor:
-
-```json
-{
-  "name": "mi-proyecto",
-  "version-string": "0.1.0",
-  "dependencies": [
-    "cpp-printer"
-  ]
-}
+```powershell
+cmake -S . -B build -A x64 `
+  -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
 ```
 
-Después configura CMake con el toolchain de vcpkg:
-
-```bash
-cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/ruta/a/vcpkg/scripts/buildsystems/vcpkg.cmake
-```
-
-vcpkg instalará automáticamente `cpp-printer` como parte de la configuración del proyecto.
-
-## 6. Importante: este tutorial usa el fork de BlueNovaStudio
+## 5. Importante: este tutorial usa el fork de BlueNovaStudio
 
 El comando:
 
 ```bash
-./vcpkg install cpp-printer
+~/.local/vcpkg/vcpkg install cpp-printer
 ```
 
 funciona con el árbol de ports que contiene el port `cpp-printer` de BlueNovaStudio.
@@ -152,7 +142,7 @@ Para publicar esta entrega, actualiza el port y su baseline a `cpp-printer`
 
 Si utilizas otra instalación de vcpkg que no tenga este port, el comando puede indicar que no existe el paquete. En ese caso, utiliza este fork o un registro de vcpkg que contenga el port.
 
-## 7. Publicar una nueva versión de cpp-printer
+## 6. Publicar una nueva versión de cpp-printer
 
 Cuando se publique una nueva versión de la biblioteca, el mantenimiento del port se realiza en el repositorio de vcpkg.
 
@@ -189,22 +179,19 @@ git pull
 ./vcpkg install cpp-printer
 ```
 
-## 8. Flujo recomendado
+## 7. Flujo recomendado
 
 Para un usuario que solo quiere instalar la biblioteca:
 
 ```bash
-cd /ruta/a/vcpkg
-git pull
-./vcpkg install cpp-printer
+curl -fsSL https://raw.githubusercontent.com/BlueNovaStudio/cpp-printer/main/scripts/install-vcpkg.sh | bash
 ```
 
 Para desarrollar un proyecto CMake:
 
 ```bash
-cd mi-proyecto
 cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/ruta/a/vcpkg/scripts/buildsystems/vcpkg.cmake
+  -DCMAKE_TOOLCHAIN_FILE="$HOME/.local/vcpkg/scripts/buildsystems/vcpkg.cmake"
 cmake --build build
 ```
 
