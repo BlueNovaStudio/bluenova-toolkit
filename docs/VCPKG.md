@@ -103,7 +103,7 @@ cmake --build build
 En el código C++ puedes incluir la biblioteca normalmente:
 
 ```cpp
-#include <all.hpp>
+#include <cpp_printer.hpp>
 ```
 
 El paquete exporta el target CMake:

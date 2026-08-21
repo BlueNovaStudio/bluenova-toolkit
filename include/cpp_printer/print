@@ -1,0 +1,4 @@
+#pragma once
+
+// Compatibilidad con #include <cpp_printer/print>.
+#include "all.hpp"

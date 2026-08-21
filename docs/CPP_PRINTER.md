@@ -13,10 +13,10 @@ añade el directorio `include` del proyecto a la línea de compilación:
 c++ -std=c++17 -I/ruta/a/cpp-printer/include main.cpp -o app
 ```
 
-Puedes incluir todos los módulos con:
+Puedes incluir todos los módulos con la cabecera pública:
 
 ```cpp
-#include "all.hpp"
+#include <cpp_printer.hpp>
 ```
 
 O incluir un header concreto:
@@ -31,7 +31,7 @@ Los headers públicos usan el namespace `cpp_printer`, incluidos los módulos de
 ## Impresores STL
 
 ```cpp
-#include "all.hpp"
+#include <cpp_printer.hpp>
 #include <map>
 #include <string>
 #include <vector>

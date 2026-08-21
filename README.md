@@ -15,10 +15,10 @@ legible y colores ANSI. No requiere dependencias externas.
 
 ## Uso rápido
 
-Incluye el agregador completo:
+Incluye el agregador público completo:
 
 ```cpp
-#include "all.hpp"
+#include <cpp_printer.hpp>
 #include <vector>
 
 int main()
@@ -47,6 +47,10 @@ También puedes incluir solo el módulo necesario, por ejemplo:
 ```cpp
 #include "cpp_printer/sequential/vector.hpp"
 ```
+
+`#include <cpp_printer.hpp>` es la cabecera recomendada: expone toda la API
+con una única inclusión, sin rutas internas. `all.hpp`, `cpp_printer/all.hpp`
+y `cpp_printer/print` continúan disponibles como aliases de compatibilidad.
 
 Las funciones de `tools` y `views` también pertenecen al namespace
 `cpp_printer`:

@@ -34,7 +34,7 @@ su ruta de inclusión y compilar con C++17.
 
 ### Punto de entrada
 
-- `all.hpp` incluye todos los módulos públicos, incluidos `compare` y `diff`.
+- `cpp_printer.hpp` incluye todos los módulos públicos, incluidos `compare` y `diff`.
   Es conveniente para prototipos o programas pequeños.
 - Para minimizar tiempo de compilación, un consumidor debe incluir solo el
   header del módulo que utiliza, por ejemplo
@@ -90,7 +90,7 @@ una vista ordenada únicamente cuando hace falta una salida determinista.
 5. Cada cambio de comportamiento debe incluir o actualizar un test en
    `tests/` y un ejemplo relevante en `examples/`.
 6. Antes de publicar, ejecuta compilación, CTest, ejemplos y una comprobación
-   de inclusión conjunta de `all.hpp`.
+   de inclusión conjunta de `cpp_printer.hpp`.
 
 El workflow [CI](../.github/workflows/ci.yml) aplica ese flujo automáticamente
 en cada push y pull request con GCC, Clang y MSVC.
